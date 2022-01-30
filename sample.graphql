@@ -1,0 +1,2207 @@
+#
+directive @hasCategory(category: UserCategory!) on FIELD_DEFINITION
+
+#
+directive @hasRole(
+  role: Role!
+  needDetails: Boolean! = false
+) on FIELD_DEFINITION
+
+#
+directive @hasSubscribedForFeature(feature: String!) on FIELD_DEFINITION
+
+#
+directive @isAuthenticated on FIELD_DEFINITION
+
+#
+input ActivateCbt {
+  #
+  id: String!
+
+  #
+  title: String!
+
+  #
+  addScoresToReporsheet: Boolean!
+
+  #
+  scoreDetails: ActivateCbtScoreDetails
+
+  #
+  subjectsDetails: [ActivateCbtSubjectDetails!]!
+}
+
+#
+input ActivateCbtScoreDetails {
+  #
+  assessmentName: String!
+
+  #
+  percentageScore: Float!
+}
+
+#
+input ActivateCbtSubjectDetails {
+  #
+  subjectName: String!
+
+  #
+  duration: Int!
+}
+
+#
+input AddSubjects {
+  #
+  subjectNames: [String!]!
+
+  #
+  classIds: [String!]!
+}
+
+#
+type AffiliateLoginResponse {
+  #
+  jwt: String!
+
+  #
+  user: AffiliateMarketer!
+}
+
+#
+type AffiliateMarketer {
+  #
+  id: String!
+
+  #
+  firstName: String!
+
+  #
+  lastName: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: String!
+
+  #
+  gender: String!
+
+  #
+  country: String!
+
+  #
+  state: String!
+
+  #
+  city: String!
+
+  #
+  walletBalance: Float!
+
+  #
+  schoolsCount: Int!
+
+  #
+  activeSchoolsCount: Int!
+
+  #
+  transactions(
+    pagination: Pagination!
+    schoolId: String
+  ): [AffiliateTransaction!]!
+}
+
+#
+type AffiliateTransaction {
+  #
+  id: String!
+
+  #
+  amount: Float!
+
+  #
+  description: String!
+
+  #
+  category: String!
+
+  #
+  status: String!
+
+  #
+  timeAdded: Time!
+}
+
+#
+input AffiliateWithdrawalInput {
+  #
+  amount: Float!
+
+  #
+  accountName: String!
+
+  #
+  bankName: String!
+
+  #
+  accountNumber: String!
+}
+
+#
+scalar Any
+
+#
+type Assessment {
+  #
+  assessmentName: String!
+
+  #
+  percentageScore: Float!
+
+  #
+  academicTerms: [String!]!
+}
+
+#
+input BulkPromoteStudentsInput {
+  #
+  studentIds: [String!]!
+
+  #
+  toClass: String!
+
+  #
+  subjectNames: [String!]!
+}
+
+#
+type Cbt {
+  #
+  id: String!
+
+  #
+  subjectNames: [String!]
+
+  #
+  status: String!
+
+  #
+  startDate: Time!
+
+  #
+  endDate: Time!
+
+  #
+  academicSession: String!
+
+  #
+  academicTerm: String!
+
+  #
+  class: Class!
+
+  #
+  subjectsDetails: Map
+
+  #
+  timeAdded: Time
+
+  #
+  getSubjectQuestions(subjectName: String!): [CbtQuestion!]!
+
+  #
+  getSubjectDetails(subjectName: String!): CbtSubjectDetails!
+
+  #
+  getSubmissions(pagination: Pagination!): [SubmittedCbtExam!]!
+}
+
+#
+enum CbtOption {
+  #
+  A
+
+  #
+  B
+
+  #
+  C
+
+  #
+  D
+
+  #
+  E
+}
+
+#
+type CbtQuestion {
+  #
+  id: String!
+
+  #
+  subjectName: String!
+
+  #
+  type: String!
+
+  #
+  topic: String!
+
+  #
+  title: String!
+
+  #
+  options: Map!
+
+  #
+  correctOption: String!
+
+  #
+  academicSession: String!
+
+  #
+  academicTerm: String!
+
+  #
+  class: Class
+}
+
+#
+type CbtSubjectDetails {
+  #
+  questionsCount: Int!
+
+  #
+  totalMarks: Int!
+
+  #
+  status: String!
+
+  #
+  duration: Int!
+
+  #
+  assessmentName: String!
+
+  #
+  percentageScore: Float!
+
+  #
+  timeActivated: Time
+}
+
+#
+type Class {
+  #
+  id: String!
+
+  #
+  category: String!
+
+  #
+  name: String!
+
+  #
+  studentsCount: Int!
+
+  #
+  subjectsCount: Int!
+
+  #
+  subjects: [Subject!]!
+
+  #
+  addedById: String!
+
+  #
+  updatedById: String!
+
+  #
+  timeAdded: Time!
+
+  #
+  lastUpdated: Time
+
+  #
+  school: School!
+
+  #
+  students(pagination: Pagination!): [Student!]!
+
+  #
+  assessments: [Assessment!]!
+
+  #
+  assessmentsCount: Int!
+
+  #
+  gradingSystems: [GradingSystem!]!
+
+  #
+  gradingSystemsCount: Int!
+
+  #
+  formTeacherId: String!
+
+  #
+  formTeacher: Staff
+}
+
+#
+type ClassBroadSheet {
+  #
+  academicSession: String!
+
+  #
+  academicTerm: String!
+
+  #
+  results: [Result!]!
+
+  #
+  class: Class!
+
+  #
+  school: School!
+}
+
+#
+type CognitiveKeys {
+  #
+  affectiveDomains: [String!]!
+
+  #
+  psychomotorDomains: [String!]!
+}
+
+#
+type CognitiveKeysRatings {
+  #
+  psychomotorDomains: Map
+
+  #
+  affectiveDomains: Map
+}
+
+#
+input EditLessonnote {
+  #
+  week: Int
+
+  #
+  date: Time
+
+  #
+  topic: String
+
+  #
+  duration: String
+
+  #
+  content: String
+
+  #
+  additionalContent: String
+
+  #
+  status: LessonnoteTeacherStatus
+}
+
+#
+scalar Email
+
+#
+type FeatureSubscription {
+  #
+  id: String!
+
+  #
+  title: String!
+
+  #
+  pricePerStudent: Float!
+}
+
+#
+type GradingSystem {
+  #
+  from: Float!
+
+  #
+  to: Float!
+
+  #
+  grade: String!
+
+  #
+  remark: String!
+}
+
+#
+type Homework {
+  #
+  id: String!
+
+  #
+  title: String!
+
+  #
+  subjectName: String!
+
+  #
+  class: Class
+
+  #
+  instruction: String!
+
+  #
+  questions: [HomeworkQuestion!]!
+
+  #
+  startDate: Time!
+
+  #
+  endDate: Time!
+
+  #
+  academicSession: String!
+
+  #
+  academicTerm: String!
+
+  #
+  teacher: Staff
+
+  #
+  submissions(pagination: Pagination!): [SubmittedHomework!]!
+}
+
+#
+input HomeworkFilter {
+  #
+  classId: String
+
+  #
+  subjectName: String
+
+  #
+  teacherId: String
+}
+
+#
+enum HomeworkOption {
+  #
+  A
+
+  #
+  B
+
+  #
+  C
+
+  #
+  D
+
+  #
+  E
+}
+
+#
+type HomeworkQuestion {
+  #
+  id: String!
+
+  #
+  type: String!
+
+  #
+  title: String!
+
+  #
+  options: StringMap!
+
+  #
+  correctOption: String!
+}
+
+#
+type Lessonnote {
+  #
+  id: String!
+
+  #
+  week: Int!
+
+  #
+  date: Time!
+
+  #
+  classId: String!
+
+  #
+  subjectName: String!
+
+  #
+  topic: String!
+
+  #
+  duration: String!
+
+  #
+  content: String!
+
+  #
+  additionalContent: String!
+
+  #
+  status: String!
+
+  #
+  comment: String
+
+  #
+  commentedBy: Staff
+
+  #
+  timeAdded: Time!
+
+  #
+  academicSession: String!
+
+  #
+  academicTerm: String!
+
+  #
+  timeCommented: Time
+
+  #
+  lastUpdated: Time
+
+  #
+  class: Class
+
+  #
+  teacher: Staff
+}
+
+#
+enum LessonnoteCommentStatus {
+  #
+  Approved
+
+  #
+  RequestedChanges
+}
+
+#
+input LessonnoteFilter {
+  #
+  classId: String
+
+  #
+  subjectName: String
+
+  #
+  week: Int
+
+  #
+  date: Time
+
+  #
+  topic: String
+
+  #
+  duration: String
+
+  #
+  status: String
+
+  #
+  teacherId: String
+}
+
+#
+enum LessonnoteTeacherStatus {
+  #
+  Draft
+
+  #
+  AwaitingApproval
+}
+
+#
+type LoginResponse {
+  #
+  jwt: String!
+
+  #
+  user: User!
+}
+
+#
+scalar Map
+
+#
+type Message {
+  #
+  id: String!
+
+  #
+  content: String!
+
+  #
+  audience: [String!]!
+
+  #
+  customNumbers: [String!]!
+
+  #
+  phoneNumbers: [String!]!
+
+  #
+  unitsUsed: Int!
+
+  #
+  addedById: String!
+
+  #
+  timeAdded: Time!
+}
+
+#
+type Mutation {
+  #
+  authLogin(userName: String!, password: String!): LoginResponse!
+
+  #
+  addAffiliateMarketer(input: NewAffiliateMarketer!): Boolean!
+
+  #
+  verifyAffiliateMarketer(verificationId: String!): Boolean!
+
+  #
+  loginAffiliateMarketer(
+    email: String!
+    password: String!
+  ): AffiliateLoginResponse!
+
+  #
+  requestAffiliateWithdrawal(
+    input: AffiliateWithdrawalInput!
+  ): AffiliateTransaction!
+
+  #
+  sendResetPasswordCode(email: String!): Boolean!
+
+  #
+  resetPassword(
+    email: String!
+    newPassword: String!
+    resetCode: String!
+  ): Boolean!
+
+  #
+  addCbtQuestion(input: NewCbtQuestion!): CbtQuestion!
+
+  #
+  setupCbtExam(input: SetupCbtExam!): Cbt!
+
+  #
+  activateCbtExam(input: ActivateCbt!): Cbt!
+
+  #
+  deleteCbtExam(examId: String!): Cbt!
+
+  #
+  bulkDeleteCbtQuestions(questionsId: [String!]!): [CbtQuestion!]!
+
+  #
+  submitCbtExam(
+    examId: String!
+    subjectName: String!
+    answers: [SubmittedCbtAnswerInput!]!
+  ): SubmittedCbtExam!
+
+  #
+  deleteCbtSubjectSubmission(
+    submissionId: String!
+    subjectName: String!
+  ): SubmittedCbtExam!
+
+  #
+  bulkDeleteCbtSubmissions(submissionIds: [String!]!): Boolean!
+
+  #
+  addClass(input: NewClass!): Class!
+
+  #
+  deleteClass(id: String!): Class!
+
+  #
+  deleteSubject(classId: String!, subjectName: String!): Class!
+
+  #
+  addSubject(input: AddSubjects!): Boolean!
+
+  #
+  addAssessments(
+    classIds: [String!]!
+    assessments: [NewAssessment!]!
+    academicTerms: [String!]
+  ): Boolean!
+
+  #
+  deleteAssessment(classId: String!, assessmentName: String!): Class!
+
+  #
+  addGradingSystem(
+    classIds: [String!]!
+    gradingSystem: NewGradingSystem!
+  ): Boolean!
+
+  #
+  deleteGradingSystem(classId: String!, grade: String!): Class!
+
+  #
+  assignFormTeacher(classId: String!, teacherId: String!): Class!
+
+  #
+  assignSubjectsTeacher(
+    teacherId: String!
+    classId: String!
+    subjectNames: [String!]!
+  ): Boolean!
+
+  #
+  publishHomework(input: NewHomework!): [Homework!]!
+
+  #
+  deleteHomework(homeworkId: String!): Homework!
+
+  #
+  submitHomework(
+    homeworkId: String!
+    answers: [SubmittedHomeworkAnswerInput!]!
+  ): SubmittedHomework!
+
+  #
+  addLessonNote(input: NewLessonnote!): Lessonnote!
+
+  #
+  editLessonNote(lessonnoteId: String!, input: EditLessonnote!): Lessonnote!
+
+  #
+  bulkDeleteLessonnotes(lessonnoteIds: [String!]): Boolean!
+
+  #
+  commentOnLessonnote(
+    lessonnoteId: String!
+    comment: String!
+    status: LessonnoteCommentStatus!
+  ): Lessonnote!
+
+  #
+  sendSms(
+    content: String!
+    audience: [String!]
+    customNumbers: [String!]
+  ): Boolean!
+
+  #
+  addParent(input: NewParent!): Parent!
+
+  #
+  deleteParent(parentId: String!): Parent!
+
+  #
+  unlinkRelatives(firstRelationId: String!, secondRelationId: String!): User!
+
+  #
+  updateSubjectReport(
+    classId: String!
+    subjectName: String!
+    updates: [SubjectReportUpdate!]!
+  ): Boolean!
+
+  #
+  withHoldResults(
+    session: String!
+    term: String!
+    classId: String!
+    studentIds: [String!]!
+    reason: String!
+  ): Boolean!
+
+  #
+  releaseResults(
+    session: String!
+    term: String!
+    classId: String!
+    resultIds: [String!]!
+  ): Boolean!
+
+  #
+  publishResults(
+    session: String!
+    term: String!
+    classIds: [String!]!
+  ): Boolean!
+
+  #
+  rateResultCognitiveKeys(
+    resultId: String!
+    psychomotorDomains: [RateResultCognitiveKey!]
+    affectiveDomains: [RateResultCognitiveKey!]
+  ): Boolean!
+
+  #
+  addResultFormTeacherComment(resultId: String!, comment: String!): Boolean!
+
+  #
+  newSchoolAdmin(input: NewSchoolAdmin!): SchoolAdmin!
+
+  #
+  verifyNewSchoolAdmin(verificationId: String!): SchoolAdmin!
+
+  #
+  schoolCreate(input: NewSchool!): School!
+
+  #
+  updateSchool(input: SchoolUpdate!): School!
+
+  #
+  addCognitiveKeys(
+    affectiveDomains: [String!]
+    psychomotorDomains: [String!]
+  ): School!
+
+  #
+  deleteCognitiveKey(
+    affectiveDomain: String
+    psychomotorDomain: String
+  ): School!
+
+  #
+  updateSchoolStamp(stampUrl: String!): Boolean!
+
+  #
+  addTeacher(input: NewTeacher!): Staff!
+
+  #
+  deleteTeacher(teacherId: String!): Staff!
+
+  #
+  addStudent(input: NewStudent!): Student!
+
+  #
+  promoteStudent(
+    studentId: String!
+    classId: String!
+    subjectNames: [String!]!
+  ): Student!
+
+  #
+  updateStudent(studentId: String!, input: UpdateUser!): Student!
+
+  #
+  deleteStudent(studentId: String!): Student!
+
+  #
+  removeSubjectsFromStudent(
+    studentId: String!
+    subjectNames: [String!]!
+  ): Student!
+
+  #
+  addSubjectsToStudent(studentId: String!, subjectNames: [String!]!): Student!
+
+  #
+  bulkPromoteStudents(input: BulkPromoteStudentsInput!): Boolean!
+
+  #
+  updateUser(userId: String!, input: UpdateUser!): User!
+}
+
+#
+input NewAffiliateMarketer {
+  #
+  firstName: String!
+
+  #
+  lastName: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: String!
+
+  #
+  password: String!
+}
+
+#
+input NewAssessment {
+  #
+  assessmentName: String!
+
+  #
+  percentageScore: Float!
+}
+
+#
+input NewCbtQuestion {
+  #
+  classId: String!
+
+  #
+  subjectName: String!
+
+  #
+  topic: String
+
+  #
+  title: String!
+
+  #
+  options: [NewCbtQuestionOption!]!
+
+  #
+  correctOption: String!
+}
+
+#
+input NewCbtQuestionOption {
+  #
+  option: String!
+
+  #
+  value: String!
+}
+
+#
+input NewClass {
+  #
+  category: String!
+
+  #
+  name: String!
+
+  #
+  subjects: [String!]!
+}
+
+#
+input NewCognitiveKeys {
+  #
+  affectiveDomains: [String!]!
+
+  #
+  psychomotorDomains: [String!]!
+}
+
+#
+input NewGradingSystem {
+  #
+  from: Float!
+
+  #
+  to: Float!
+
+  #
+  grade: String!
+
+  #
+  remark: String!
+}
+
+#
+input NewHomework {
+  #
+  title: String!
+
+  #
+  subjects: [NewHomeworkSubject!]!
+
+  #
+  questions: [NewHomeworkQuestion!]!
+
+  #
+  instruction: String
+
+  #
+  startDate: Time!
+
+  #
+  endDate: Time!
+}
+
+#
+input NewHomeworkQuestion {
+  #
+  title: String!
+
+  #
+  options: [NewHomeworkQuestionOption!]!
+
+  #
+  correctOption: HomeworkOption!
+}
+
+#
+input NewHomeworkQuestionOption {
+  #
+  key: HomeworkOption!
+
+  #
+  value: String!
+}
+
+#
+input NewHomeworkSubject {
+  #
+  classId: String!
+
+  #
+  subjectName: String!
+}
+
+#
+input NewLessonnote {
+  #
+  week: Int!
+
+  #
+  date: Time!
+
+  #
+  classId: String!
+
+  #
+  subjectName: String!
+
+  #
+  topic: String!
+
+  #
+  duration: String!
+
+  #
+  content: String!
+
+  #
+  status: LessonnoteTeacherStatus!
+
+  #
+  additionalContent: String!
+}
+
+#
+input NewParent {
+  #
+  firstName: String!
+
+  #
+  lastName: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: String
+
+  #
+  address: String
+
+  #
+  gender: String
+
+  #
+  country: String
+
+  #
+  state: String
+
+  #
+  city: String
+
+  #
+  studentIds: [String!]!
+
+  #
+  relationship: String!
+
+  #
+  password: String!
+}
+
+#
+input NewSchool {
+  #
+  name: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: String!
+
+  #
+  country: String!
+
+  #
+  state: String!
+
+  #
+  city: String!
+
+  #
+  address: String!
+
+  #
+  prefix: String!
+
+  #
+  type: String!
+
+  #
+  curriculum: String!
+
+  #
+  categories: [String!]!
+
+  #
+  motto: String!
+
+  #
+  adminEmail: String!
+}
+
+#
+input NewSchoolAdmin {
+  #
+  firstName: String!
+
+  #
+  lastName: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: String!
+
+  #
+  password: String!
+
+  #
+  verificationUrl: String!
+
+  #
+  referredBy: String
+}
+
+#
+input NewStudent {
+  #
+  firstName: String!
+
+  #
+  middleName: String
+
+  #
+  lastName: String!
+
+  #
+  password: String!
+
+  #
+  phoneNumber: String
+
+  #
+  email: String
+
+  #
+  address: String
+
+  #
+  gender: String
+
+  #
+  country: String
+
+  #
+  state: String
+
+  #
+  city: String
+
+  #
+  classId: String!
+
+  #
+  subjectNames: [String!]!
+
+  #
+  parents: [String!]!
+}
+
+#
+input NewTeacher {
+  #
+  firstName: String!
+
+  #
+  lastName: String!
+
+  #
+  password: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  classes: [NewTeacherClasses!]!
+
+  #
+  email: String
+
+  #
+  address: String
+
+  #
+  gender: String
+
+  #
+  country: String
+
+  #
+  state: String
+
+  #
+  city: String
+
+  #
+  role: String
+}
+
+#
+input NewTeacherClasses {
+  #
+  classId: String!
+
+  #
+  subjectNames: [String!]!
+}
+
+#
+input Pagination {
+  #
+  afterId: String!
+
+  #
+  limit: Int!
+}
+
+#
+type Parent {
+  #
+  id: String!
+
+  #
+  userName: String!
+
+  #
+  firstName: String!
+
+  #
+  lastName: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: String!
+
+  #
+  address: String!
+
+  #
+  gender: String!
+
+  #
+  country: String!
+
+  #
+  state: String!
+
+  #
+  city: String!
+
+  #
+  status: String!
+
+  #
+  profileImageURL: String!
+
+  #
+  schoolPrefix: String!
+
+  #
+  schoolId: String!
+
+  #
+  school: School!
+
+  #
+  relationsCount: Int!
+
+  #
+  relations: [StudentRelation!]!
+
+  #
+  schoolReferrals: [SchoolReferral!]!
+
+  #
+  referralWalletBalance: Float!
+}
+
+#
+type ParentRelation {
+  #
+  relationship: String!
+
+  #
+  parent: Parent!
+}
+
+#
+type Query {
+  #
+  user(id: String!): User!
+
+  #
+  getReferrerSchools(pagination: Pagination!): [School!]!
+
+  #
+  getAffiliateMarketer: AffiliateMarketer!
+
+  #
+  getAffiliateTransactions(
+    pagination: Pagination!
+    schoolId: String
+  ): [AffiliateTransaction!]!
+
+  #
+  getCbtExam(examId: String!): Cbt!
+
+  #
+  getCbtExams(
+    classId: String
+    subjectName: String
+    teacherId: String
+    pagination: Pagination!
+  ): [Cbt!]
+
+  #
+  getStudentCbtExams(pagination: Pagination!): [Cbt!]
+
+  #
+  getCbtQuestions(
+    classId: String
+    subjectName: String
+    teacherId: String
+    search: String
+    pagination: Pagination!
+  ): [CbtQuestion!]
+
+  #
+  getCbtQuestion(questionId: String!): CbtQuestion!
+
+  #
+  getCbtSubmission(submissionId: String!): SubmittedCbtExam!
+
+  #
+  classes(pagination: Pagination!, schoolId: String): [Class!]!
+
+  #
+  class(id: String!): Class!
+
+  #
+  getHomework(homeworkId: String!): Homework!
+
+  #
+  getHomeworks(pagination: Pagination!, filter: HomeworkFilter): [Homework!]!
+
+  #
+  getStudentHomeworks(pagination: Pagination!, studentId: String): [Homework!]!
+
+  #
+  getStudentHomeworkSubmissions(
+    pagination: Pagination!
+    studentId: String
+  ): [SubmittedHomework!]!
+
+  #
+  getLessonnote(lessonnoteId: String!): Lessonnote!
+
+  #
+  getLessonnotes(
+    pagination: Pagination!
+    filter: LessonnoteFilter
+  ): [Lessonnote!]!
+
+  #
+  parents(pagination: Pagination!, schoolId: String, search: String): [Parent!]!
+
+  #
+  subjectReport(
+    classId: String!
+    subjectName: String!
+    pagination: Pagination!
+  ): SubjectReport!
+
+  #
+  getWithHeldResults(
+    session: String!
+    term: String!
+    classId: String!
+    pagination: Pagination!
+  ): [Result!]!
+
+  #
+  getStudentResult(session: String!, term: String!, studentId: String!): Result!
+
+  #
+  getStudentResultByUserName(
+    session: String!
+    term: String!
+    userName: String!
+  ): Result!
+
+  #
+  getClassBroadSheet(
+    classId: String!
+    academicSession: String!
+    academicTerm: String!
+  ): ClassBroadSheet!
+
+  #
+  schoolExist(prefix: String!): Boolean!
+
+  #
+  school(schoolId: String): School!
+
+  #
+  staffs(pagination: Pagination!, schoolId: String, search: String): [Staff!]!
+
+  #
+  students(
+    pagination: Pagination!
+    schoolId: String
+    teacherId: String
+    classId: String
+    search: String
+  ): [Student!]!
+
+  #
+  getSubscriptionDetails: [FeatureSubscription!]!
+}
+
+#
+input RateResultCognitiveKey {
+  #
+  name: String!
+
+  #
+  rating: Int!
+}
+
+#
+type Result {
+  #
+  id: String!
+
+  #
+  student: Student
+
+  #
+  class: Class
+
+  #
+  subjects: [String]!
+
+  #
+  academicSession: String!
+
+  #
+  academicTerm: String!
+
+  #
+  status: String!
+
+  #
+  withHoldReason: String!
+
+  #
+  withHeldOn: Time
+
+  #
+  published: Boolean!
+
+  #
+  publishedOn: Time
+
+  #
+  scores: Map
+
+  #
+  bestSubject: String!
+
+  #
+  leastSubject: String!
+
+  #
+  totalScore: Float!
+
+  #
+  averageScore: Float!
+
+  #
+  overallGrading: GradingSystem!
+
+  #
+  subjectGrades: Map
+
+  #
+  cognitiveKeysRatings: CognitiveKeysRatings!
+
+  #
+  formTeacherComment: String!
+
+  #
+  principalComment: String!
+
+  #
+  subjectsTeacher: [ResultSubjectTeacher!]!
+}
+
+#
+type ResultSubjectTeacher {
+  #
+  subjectName: String!
+
+  #
+  teacher: Staff
+}
+
+#
+enum Role {
+  #
+  ADMIN
+
+  #
+  STUDENT
+
+  #
+  TEACHER
+
+  #
+  MARKETER
+}
+
+#
+type School {
+  #
+  id: String!
+
+  #
+  name: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: Email!
+
+  #
+  country: String!
+
+  #
+  state: String!
+
+  #
+  city: String!
+
+  #
+  address: String!
+
+  #
+  prefix: String!
+
+  #
+  type: String!
+
+  #
+  curriculum: String!
+
+  #
+  categories: [String!]!
+
+  #
+  motto: String!
+
+  #
+  logoUrl: String!
+
+  #
+  stampUrl: String!
+
+  #
+  academicSession: String!
+
+  #
+  academicTerm: String!
+
+  #
+  academicSessions: [String!]!
+
+  #
+  academicTerms: [String!]!
+
+  #
+  timeAdded: Time!
+
+  #
+  cognitiveKeys: CognitiveKeys!
+
+  #
+  classes(pagination: Pagination!): [Class!]!
+
+  #
+  classesCount: Int!
+
+  #
+  students(pagination: Pagination!): [Student!]!
+
+  #
+  studentsCount: Int!
+
+  #
+  staffs(pagination: Pagination!): [Staff!]!
+
+  #
+  teachersCount: Int!
+
+  #
+  parents(pagination: Pagination!): [Parent!]!
+
+  #
+  parentsCount: Int!
+
+  #
+  smsUnit: Float!
+
+  #
+  subscriptionDetails: [FeatureSubscription!]!
+}
+
+#
+type SchoolAdmin {
+  #
+  id: String!
+
+  #
+  firstName: String!
+
+  #
+  lastName: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: String!
+
+  #
+  isVerified: Boolean!
+
+  #
+  verificationUrl: String!
+
+  #
+  timeVerified: Time
+
+  #
+  timeAdded: Time!
+}
+
+#
+type SchoolReferral {
+  #
+  schoolName: String!
+
+  #
+  amountEarned: Float!
+
+  #
+  commission: Float!
+
+  #
+  timeAdded: Time!
+}
+
+#
+input SchoolUpdate {
+  #
+  name: String
+
+  #
+  email: String
+
+  #
+  phoneNumber: String
+
+  #
+  country: String
+
+  #
+  state: String
+
+  #
+  city: String
+
+  #
+  motto: String
+
+  #
+  address: String
+
+  #
+  academicSession: String
+
+  #
+  academicTerm: String
+}
+
+#
+input SetupCbtExam {
+  #
+  classId: String!
+
+  #
+  startDate: Time!
+
+  #
+  endDate: Time!
+
+  #
+  subjectsDetails: [SetupCbtExamSubjectDetails!]!
+}
+
+#
+input SetupCbtExamSubjectDetails {
+  #
+  subjectName: String!
+
+  #
+  questionsCount: Int!
+
+  #
+  totalMarks: Int!
+}
+
+#
+type Staff {
+  #
+  id: String!
+
+  #
+  userName: String!
+
+  #
+  firstName: String!
+
+  #
+  middleName: String!
+
+  #
+  lastName: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: String!
+
+  #
+  address: String!
+
+  #
+  gender: String!
+
+  #
+  country: String!
+
+  #
+  state: String!
+
+  #
+  city: String!
+
+  #
+  status: String!
+
+  #
+  profileImageURL: String!
+
+  #
+  role: String!
+
+  #
+  schoolPrefix: String!
+
+  #
+  schoolId: String!
+
+  #
+  position: String!
+
+  #
+  school: School!
+
+  #
+  formClassesCount: Int!
+
+  #
+  classesCount: Int!
+
+  #
+  subjectsCount: Int!
+
+  #
+  studentsCount: Int!
+
+  #
+  classes: [TeacherClass!]!
+
+  #
+  schoolReferrals: [SchoolReferral!]!
+
+  #
+  referralWalletBalance: Float!
+}
+
+#
+scalar StringMap
+
+#
+type Student {
+  #
+  id: String!
+
+  #
+  userName: String!
+
+  #
+  firstName: String!
+
+  #
+  middleName: String!
+
+  #
+  lastName: String!
+
+  #
+  phoneNumber: String!
+
+  #
+  email: String!
+
+  #
+  address: String!
+
+  #
+  gender: String!
+
+  #
+  country: String!
+
+  #
+  state: String!
+
+  #
+  city: String!
+
+  #
+  status: String!
+
+  #
+  classId: String!
+
+  #
+  profileImageURL: String!
+
+  #
+  schoolPrefix: String!
+
+  #
+  subjects: [String!]!
+
+  #
+  subjectsCount: Int!
+
+  #
+  schoolId: String!
+
+  #
+  school: School!
+
+  #
+  class: Class
+
+  #
+  relationsCount: Int!
+
+  #
+  relations: [ParentRelation!]!
+
+  #
+  cbtExams(pagination: Pagination!): [Cbt!]
+
+  #
+  schoolReferrals: [SchoolReferral!]!
+
+  #
+  referralWalletBalance: Float!
+}
+
+#
+type StudentRelation {
+  #
+  relationship: String!
+
+  #
+  student: Student!
+}
+
+#
+type StudentSubjectReport {
+  #
+  id: String!
+
+  #
+  firstName: String!
+
+  #
+  middleName: String!
+
+  #
+  lastName: String!
+
+  #
+  total: Float!
+
+  #
+  scores: Map!
+}
+
+#
+type Subject {
+  #
+  name: String!
+
+  #
+  studentsCount: Int!
+
+  #
+  cbtQuestionsCount: Int!
+}
+
+#
+type SubjectReport {
+  #
+  studentsCount: Int!
+
+  #
+  assessments: [Assessment!]!
+
+  #
+  studentsReport: [StudentSubjectReport!]!
+}
+
+#
+input SubjectReportUpdate {
+  #
+  studentId: String!
+
+  #
+  scores: [SubjectScoreUpdate!]!
+}
+
+#
+input SubjectScoreUpdate {
+  #
+  assessmentName: String!
+
+  #
+  score: Float!
+}
+
+#
+type SubmittedCbtAnswer {
+  #
+  questionNumber: Int!
+
+  #
+  option: String!
+}
+
+#
+input SubmittedCbtAnswerInput {
+  #
+  questionNumber: Int!
+
+  #
+  option: CbtOption!
+}
+
+#
+type SubmittedCbtExam {
+  #
+  id: String!
+
+  #
+  student: Student
+
+  #
+  subjectNames: [String!]!
+
+  #
+  subjectsSubmission: [SubmittedCbtSubjectDetails!]!
+
+  #
+  subjectSubmission(subjectName: String!): SubmittedCbtSubjectDetails!
+
+  #
+  totalScore: Float!
+
+  #
+  timeAdded: Time
+}
+
+#
+type SubmittedCbtSubjectDetails {
+  #
+  subjectName: String!
+
+  #
+  score: Float!
+
+  #
+  examTotalMarks: Int!
+
+  #
+  timeAdded: Time
+
+  #
+  questionsAnswer: [SubmittedCbtAnswer!]!
+}
+
+#
+type SubmittedHomework {
+  #
+  id: String!
+
+  #
+  student: Student
+
+  #
+  subjectName: String!
+
+  #
+  totalScore: Float!
+
+  #
+  timeAdded: Time
+
+  #
+  homework: Homework
+}
+
+#
+input SubmittedHomeworkAnswerInput {
+  #
+  questionId: String!
+
+  #
+  option: HomeworkOption!
+}
+
+#
+type TeacherClass {
+  #
+  subjectNames: [String!]! @deprecated(reason: "Use `subjects` instead.")
+
+  #
+  class: Class!
+
+  #
+  subjects: [Subject!]!
+}
+
+#
+scalar Time
+
+#
+input UpdateUser {
+  #
+  firstName: String
+
+  #
+  middleName: String
+
+  #
+  lastName: String
+
+  #
+  password: String
+
+  #
+  phoneNumber: String
+
+  #
+  email: String
+
+  #
+  address: String
+
+  #
+  gender: String
+
+  #
+  country: String
+
+  #
+  state: String
+
+  #
+  city: String
+}
+
+#
+union User = Staff | Student | Parent
+
+#
+enum UserCategory {
+  #
+  STAFF
+
+  #
+  STUDENT
+
+  #
+  PARENT
+}
