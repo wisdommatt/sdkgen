@@ -10,6 +10,27 @@ import (
 	"github.com/vektah/gqlparser/ast"
 )
 
+// Schema contains the data about a graphql schema after
+// extraction.
+type Schema struct {
+	AstSchema *ast.Schema
+	Objects   map[string]*ast.Definition
+	Scalars   map[string]*ast.Definition
+	Unions    map[string]*ast.Definition
+	Enums     map[string]*ast.Definition
+}
+
+// NewSchema creates a new schema from an ast schema object.
+func NewSchema(astSchema *ast.Schema) *Schema {
+	return &Schema{
+		AstSchema: astSchema,
+		Objects:   make(map[string]*ast.Definition),
+		Scalars:   make(map[string]*ast.Definition),
+		Unions:    make(map[string]*ast.Definition),
+		Enums:     make(map[string]*ast.Definition),
+	}
+}
+
 var (
 	graphqlDefaultFieldsMap = map[string]string{
 		"Int":     "int",
@@ -54,7 +75,7 @@ var (
 )
 
 // LoadGraphqlSchema loads graphql schemas from graphql schema files.
-func LoadGraphqlSchema(filenames ...string) (*ast.Schema, error) {
+func LoadGraphqlSchema(filenames ...string) (*Schema, error) {
 	sources := []*ast.Source{}
 	for _, filename := range filenames {
 		fileContents, err := os.ReadFile(filename)
@@ -65,26 +86,39 @@ func LoadGraphqlSchema(filenames ...string) (*ast.Schema, error) {
 			Input: string(fileContents),
 		})
 	}
-	schema, err := gqlparser.LoadSchema(sources...)
+	astSchema, err := gqlparser.LoadSchema(sources...)
 	if err != nil {
 		return nil, err
 	}
+	schema := NewSchema(astSchema)
 	return parseSchema(schema), nil
 }
 
-func parseSchema(schema *ast.Schema) *ast.Schema {
-	schemaTypes := map[string]*ast.Definition{}
-	for key, typ := range schema.Types {
-		if _, ok := graphqlDefaultFieldsMap[key]; !ok {
-			schemaTypes[key] = typ
+func parseSchema(schema *Schema) *Schema {
+	for key, typ := range schema.AstSchema.Types {
+		if _, ok := graphqlDefaultFieldsMap[key]; ok {
+			continue
+		}
+
+		switch typ.Kind {
+		case ast.Scalar:
+			schema.Scalars[key] = typ
+
+		case ast.Union:
+			schema.Unions[key] = typ
+
+		case ast.Enum:
+			schema.Enums[key] = typ
+
+		case ast.Object, ast.InputObject:
+			schema.Objects[key] = typ
 		}
 	}
-	schema.Types = schemaTypes
 	return schema
 }
 
 // GenerateSDKClient generates a graphql sdk client from schema.
-func GenerateSDKClient(schema *ast.Schema, outFile string) error {
+func GenerateSDKClient(schema *Schema, outFile string) error {
 	clientTmp, err := template.New("client.go.tpl").Funcs(templateFuncs).
 		ParseFiles("graphql/templates/client.go.tpl")
 	if err != nil {
