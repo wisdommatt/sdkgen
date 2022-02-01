@@ -40,10 +40,11 @@ var (
 		"Boolean": "bool",
 		"Time":    "time.Time",
 		"Date":    "time.Time",
+		"Email":   "string",
 	}
 
 	templateFuncs = template.FuncMap{
-		"extractFieldTypeName": func(field *ast.FieldDefinition) string {
+		"extractFieldTypeName": func(schema *Schema, field *ast.FieldDefinition) string {
 			fieldType := strings.ReplaceAll(field.Type.Name(), "!", "")
 
 			// checking if field type is an array.
@@ -65,6 +66,11 @@ var (
 					return typeName
 				}
 				return "*" + typeName
+			}
+			// return field type as interface{} if initial field type
+			// is a graphql scalar.
+			if _, ok := schema.Scalars[fieldType]; ok {
+				return "interface{}"
 			}
 			if field.Type.NonNull {
 				return fieldType

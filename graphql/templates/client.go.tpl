@@ -2,11 +2,13 @@
 
 package example
 
+{{ $schema := . }}
+
 {{ range $val := .Objects }}
 // {{ $val.Description }}
 type {{ $val.Name }} struct {
     {{ range $field := $val.Fields }} // {{ $field.Description }}
-    {{ $field.Name }} {{ extractFieldTypeName $field }}
+    {{ $field.Name }} {{ extractFieldTypeName $schema $field }}
     {{ end }}
 }
 {{ end }}
