@@ -3,8 +3,10 @@
 package example
 
 {{ range $val := .Objects }}
+// {{ $val.Description }}
 type {{ $val.Name }} struct {
-    {{ range $field := $val.Fields }} {{ $field.Name }} {{ extractFieldTypeName $field }}
+    {{ range $field := $val.Fields }} // {{ $field.Description }}
+    {{ $field.Name }} {{ extractFieldTypeName $field }}
     {{ end }}
 }
 {{ end }}
