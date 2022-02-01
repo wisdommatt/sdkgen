@@ -8,7 +8,7 @@ package example
 // {{ $val.Description }}
 type {{ $val.Name }} struct {
     {{ range $field := $val.Fields }} // {{ $field.Description }}
-    {{ $field.Name }} {{ extractFieldTypeName $schema $field }}
+    {{ $field.Name }} {{ extractFieldTypeName $schema $field }} `json:"{{ $field.Name }}"`
     {{ end }}
 }
 {{ end }}
