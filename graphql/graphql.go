@@ -17,6 +17,8 @@ var (
 		"Float":   "float64",
 		"ID":      "string",
 		"Boolean": "bool",
+		"Time":    "time.Time",
+		"Date":    "time.Time",
 	}
 
 	templateFuncs = template.FuncMap{
@@ -63,7 +65,22 @@ func LoadGraphqlSchema(filenames ...string) (*ast.Schema, error) {
 			Input: string(fileContents),
 		})
 	}
-	return gqlparser.LoadSchema(sources...)
+	schema, err := gqlparser.LoadSchema(sources...)
+	if err != nil {
+		return nil, err
+	}
+	return parseSchema(schema), nil
+}
+
+func parseSchema(schema *ast.Schema) *ast.Schema {
+	schemaTypes := map[string]*ast.Definition{}
+	for key, typ := range schema.Types {
+		if _, ok := graphqlDefaultFieldsMap[key]; !ok {
+			schemaTypes[key] = typ
+		}
+	}
+	schema.Types = schemaTypes
+	return schema
 }
 
 // GenerateSDKClient generates a graphql sdk client from schema.
