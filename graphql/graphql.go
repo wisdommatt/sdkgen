@@ -1,7 +1,10 @@
 package graphql
 
 import (
+	"bytes"
+	"log"
 	"os"
+	"text/template"
 
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
@@ -20,4 +23,19 @@ func LoadGraphqlSchema(filenames ...string) (*ast.Schema, error) {
 		})
 	}
 	return gqlparser.LoadSchema(sources...)
+}
+
+// GenerateSDKClient generates a graphql sdk client from schema.
+func GenerateSDKClient(schema *ast.Schema, outFile string) error {
+	clientTmp, err := template.ParseFiles("graphql/templates/client.go.tpl")
+	if err != nil {
+		return err
+	}
+	buffer := &bytes.Buffer{}
+	err = clientTmp.Execute(buffer, schema)
+	if err != nil {
+		return err
+	}
+	log.Println(buffer.String())
+	return nil
 }
