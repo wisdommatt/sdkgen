@@ -6,6 +6,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/iancoleman/strcase"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
 )
@@ -76,6 +77,9 @@ var (
 				return fieldType
 			}
 			return "*" + fieldType
+		},
+		"toCamelCase": func(str string) string {
+			return strcase.ToCamel(str)
 		},
 	}
 )
