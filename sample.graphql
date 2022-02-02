@@ -2205,3 +2205,7 @@ enum UserCategory {
   #
   PARENT
 }
+
+type Subscription {
+  streamSample(pagination: Pagination!): [User!]!
+}

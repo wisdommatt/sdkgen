@@ -4,6 +4,7 @@ package example
 
 import (
     "time"
+    "context"
 )
 
 {{ $schema := . }}
@@ -49,8 +50,40 @@ func (e {{ $enumName }}) String() string {
 {{ range $val := .Objects }}
 {{ if isExported $val.Name }}
 type {{ $val.Name }} struct {
-    {{ range $field := $val.Fields }} {{ if and (isExported $field.Name) (isExported $field.Type.Name) }} {{ toCamelCase $field.Name }} {{ extractFieldTypeName $schema $field }} `json:"{{ $field.Name }}"` {{ end }}
+    {{ range $field := $val.Fields }} {{ if and (isExported $field.Name) (isExported $field.Type.Name) }} {{ toCamelCase $field.Name }} {{ extractFieldTypeName $schema $field.Name $field.Type }} `json:"{{ $field.Name }}"` {{ end }}
     {{ end }}
 }
 {{ end }}
 {{ end }}
+
+type GraphqlClient interface {
+    Mutations
+    Queries
+    Subscriptions
+}
+
+{{/* Generating mutations interface methods */}}
+type Mutations interface {
+    {{ range $mutation := $schema.Mutations }} {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ extractFieldTypeName $schema $mutation.Name $mutation.Type }}, error)
+    {{ end }}
+}
+
+type Queries interface {
+
+}
+
+type Subscriptions interface {
+
+}
+
+// GqlClient is the default implementation for 
+// GraphqlClient interface.
+type GqlClient struct {
+
+}
+
+// NewGraphqlClient returns a new graphql client.
+func NewGraphqlClient() *GqlClient {
+    return &GqlClient{}
+}
+
