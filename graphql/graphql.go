@@ -60,10 +60,15 @@ var (
 					}
 					return "[]*" + typeName
 				}
-				if typ.Elem.NonNull {
-					return "[]" + fieldType
+				// return field type as interface{} if initial field type
+				// is a graphql scalar.
+				if _, ok := schema.Scalars[fieldType]; ok {
+					return "[]interface{}"
 				}
-				return "[]*" + fieldType
+				if typ.Elem.NonNull {
+					return "[]" + strcase.ToCamel(fieldType)
+				}
+				return "[]*" + strcase.ToCamel(fieldType)
 			}
 
 			if typeName, ok := graphqlDefaultFieldsMap[fieldType]; ok {
@@ -78,9 +83,9 @@ var (
 				return "interface{}"
 			}
 			if typ.NonNull {
-				return fieldType
+				return strcase.ToCamel(fieldType)
 			}
-			return "*" + fieldType
+			return "*" + strcase.ToCamel(fieldType)
 		},
 		"toCamelCase": func(str string) string {
 			if strings.HasPrefix(str, "__") {

@@ -74,8 +74,10 @@ type Queries interface {
     {{ end }}{{ end }}
 }
 
+{{/* Generating subscriptions interface methods */}}
 type Subscriptions interface {
-
+    {{ range $sub := $schema.Subscriptions }} {{ if isExported $sub.Name }} {{ toCamelCase $sub.Name }}(ctx context.Context, {{ range $arg := $sub.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ extractFieldTypeName $schema $sub.Name $sub.Type }}, error)
+    {{ end }}{{ end }}
 }
 
 // GqlClient is the default implementation for 

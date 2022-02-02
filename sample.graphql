@@ -110,6 +110,8 @@ type AffiliateMarketer {
     pagination: Pagination!
     schoolId: String
   ): [AffiliateTransaction!]!
+
+  maps: [Map!]!
 }
 
 #
