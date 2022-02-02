@@ -8,6 +8,18 @@ import (
 
 {{ $schema := . }}
 
+{{/* Generating Go types for graphql Unions */}}
+{{ range $union := .Unions }}
+
+{{ $unionName := toCamelCase $union.Name }}
+
+type {{ $unionName }} interface {
+    Is{{ $unionName }}()
+}
+
+{{ end }}
+
+{{/* Generating Go types for graphql Enums */}}
 {{ range $enum := .Enums }}
 
 {{ $enumName := toCamelCase $enum.Name }}
@@ -34,6 +46,7 @@ func (e {{ $enumName }}) String() string {
 }
 {{ end }}
 
+{{/* Generating Go types for graphql Types (inputs, objects) */}}
 {{ range $val := .Objects }}
 // {{ $val.Description }}
 type {{ $val.Name }} struct {

@@ -79,6 +79,9 @@ var (
 			return "*" + fieldType
 		},
 		"toCamelCase": func(str string) string {
+			if strings.HasPrefix(str, "__") {
+				return str
+			}
 			return strcase.ToCamel(str)
 		},
 		"isLastEnumField": func(enum ast.EnumValueList, key int) bool {
