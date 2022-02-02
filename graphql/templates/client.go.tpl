@@ -9,16 +9,27 @@ import (
 {{ $schema := . }}
 
 {{ range $enum := .Enums }}
-// {{ $enum.Description }}
-type {{ toCamelCase $enum.Name }} string
+
+{{ $enumName := toCamelCase $enum.Name }}
+
+// {{ $enumName }} {{ $enum.Description }}
+type {{ $enumName }} string
 
 var (
-    {{ range $val := $enum.EnumValues }}// {{ $val.Description }}
-    {{ toCamelCase $enum.Name }}{{ toCamelCase $val.Name }} {{ toCamelCase $enum.Name }} = "{{ toCamelCase $val.Name }}"
+    {{ range $val := $enum.EnumValues }} // {{ toCamelCase $val.Name }} {{ $val.Description }}
+    {{ $enumName }}{{ toCamelCase $val.Name }} {{ $enumName }} = "{{ toCamelCase $val.Name }}"
     {{ end }}
 )
 
-func (e {{ toCamelCase $enum.Name }}) String() string {
+func (e {{ $enumName }}) IsValid() bool {
+    switch e {
+    case {{ range $key, $val := $enum.EnumValues }} {{ $enumName }}{{ toCamelCase $val.Name }} {{ if not (isLastEnumField $enum.EnumValues $key) }}, {{ end }} {{ end }}:
+        return true
+    }
+    return false
+}
+
+func (e {{ $enumName }}) String() string {
     return string(e)
 }
 {{ end }}

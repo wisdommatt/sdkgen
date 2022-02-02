@@ -81,6 +81,9 @@ var (
 		"toCamelCase": func(str string) string {
 			return strcase.ToCamel(str)
 		},
+		"isLastEnumField": func(enum ast.EnumValueList, key int) bool {
+			return len(enum)-1 == key
+		},
 	}
 )
 
