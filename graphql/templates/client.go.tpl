@@ -21,15 +21,13 @@ type {{ $unionName }} interface {
 
 {{/* Generating Go types for graphql Enums */}}
 {{ range $enum := .Enums }}
-
+{{ if isExported $enum.Name }}
 {{ $enumName := toCamelCase $enum.Name }}
 
-// {{ $enumName }} {{ $enum.Description }}
 type {{ $enumName }} string
 
 var (
-    {{ range $val := $enum.EnumValues }} // {{ toCamelCase $val.Name }} {{ $val.Description }}
-    {{ $enumName }}{{ toCamelCase $val.Name }} {{ $enumName }} = "{{ toCamelCase $val.Name }}"
+    {{ range $val := $enum.EnumValues }} {{ $enumName }}{{ toCamelCase $val.Name }} {{ $enumName }} = "{{ toCamelCase $val.Name }}"
     {{ end }}
 )
 
@@ -45,13 +43,14 @@ func (e {{ $enumName }}) String() string {
     return string(e)
 }
 {{ end }}
+{{ end }}
 
 {{/* Generating Go types for graphql Types (inputs, objects) */}}
 {{ range $val := .Objects }}
-// {{ $val.Description }}
+{{ if isExported $val.Name }}
 type {{ $val.Name }} struct {
-    {{ range $field := $val.Fields }} // {{ $field.Description }}
-    {{ toCamelCase $field.Name }} {{ extractFieldTypeName $schema $field }} `json:"{{ $field.Name }}"`
+    {{ range $field := $val.Fields }} {{ if and (isExported $field.Name) (isExported $field.Type.Name) }} {{ toCamelCase $field.Name }} {{ extractFieldTypeName $schema $field }} `json:"{{ $field.Name }}"` {{ end }}
     {{ end }}
 }
+{{ end }}
 {{ end }}

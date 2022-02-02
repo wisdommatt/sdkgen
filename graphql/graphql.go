@@ -9,6 +9,7 @@ import (
 	"github.com/iancoleman/strcase"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
+	"golang.org/x/tools/imports"
 )
 
 // Schema contains the data about a graphql schema after
@@ -87,6 +88,9 @@ var (
 		"isLastEnumField": func(enum ast.EnumValueList, key int) bool {
 			return len(enum)-1 == key
 		},
+		"isExported": func(str string) bool {
+			return !strings.HasPrefix(str, "_")
+		},
 	}
 )
 
@@ -145,9 +149,9 @@ func GenerateSDKClient(schema *Schema, outFile string) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(outFile, buffer.Bytes(), 0600)
+	res, err := imports.Process(outFile, buffer.Bytes(), nil)
 	if err != nil {
 		return err
 	}
-	return nil
+	return os.WriteFile(outFile, res, 0666)
 }
