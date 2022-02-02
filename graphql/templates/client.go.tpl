@@ -17,6 +17,10 @@ var (
     {{ toCamelCase $enum.Name }}{{ toCamelCase $val.Name }} {{ toCamelCase $enum.Name }} = "{{ toCamelCase $val.Name }}"
     {{ end }}
 )
+
+func (e {{ toCamelCase $enum.Name }}) String() string {
+    return string(e)
+}
 {{ end }}
 
 {{ range $val := .Objects }}
