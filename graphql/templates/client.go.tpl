@@ -8,6 +8,17 @@ import (
 
 {{ $schema := . }}
 
+{{ range $enum := .Enums }}
+// {{ $enum.Description }}
+type {{ toCamelCase $enum.Name }} string
+
+var (
+    {{ range $val := $enum.EnumValues }}// {{ $val.Description }}
+    {{ toCamelCase $enum.Name }}{{ toCamelCase $val.Name }} {{ toCamelCase $enum.Name }} = "{{ toCamelCase $val.Name }}"
+    {{ end }}
+)
+{{ end }}
+
 {{ range $val := .Objects }}
 // {{ $val.Description }}
 type {{ $val.Name }} struct {
