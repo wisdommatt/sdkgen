@@ -64,12 +64,14 @@ type GraphqlClient interface {
 
 {{/* Generating mutations interface methods */}}
 type Mutations interface {
-    {{ range $mutation := $schema.Mutations }} {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ extractFieldTypeName $schema $mutation.Name $mutation.Type }}, error)
-    {{ end }}
+    {{ range $mutation := $schema.Mutations }} {{ if isExported $mutation.Name }} {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ extractFieldTypeName $schema $mutation.Name $mutation.Type }}, error)
+    {{ end }}{{ end }}
 }
 
+{{/* Generating queries interface methods */}}
 type Queries interface {
-
+    {{ range $query := $schema.Queries }} {{ if isExported $query.Name }} {{ toCamelCase $query.Name }}(ctx context.Context, {{ range $arg := $query.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ extractFieldTypeName $schema $query.Name $query.Type }}, error)
+    {{ end }}{{ end }}
 }
 
 type Subscriptions interface {
