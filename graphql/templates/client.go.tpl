@@ -6,6 +6,7 @@ import (
     "time"
     "context"
     "fmt"
+    "strings"
     "github.com/machinebox/graphql"
 )
 
@@ -126,6 +127,9 @@ type Mutation struct {
     {{ $responseName := extractFieldTypeName $schema $mutation.Name $mutation.Type }}
     {{ $pointerResponse := toPointerTypeName $schema $responseName $mutation.Type }}
     func (m *Mutation) {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }} gqlFields string) ({{ $pointerResponse }}, error) {
+        if strings.TrimSpace(gqlFields) == "" {
+            gqlFields = `{{ extractTypeFieldsAsString $schema $mutation.Type }}`
+        }
         req := graphql.NewRequest(fmt.Sprintf(`
             mutation({{ range $arg := $mutation.Arguments }}${{ $arg.Name }}: {{ $arg.Type }}, {{ end }}) {
                 {{ $mutation.Name }}({{ range $arg := $mutation.Arguments }}{{ $arg.Name }}: ${{ $arg.Name }}, {{ end }}) %s

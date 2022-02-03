@@ -127,6 +127,29 @@ var (
 			}
 			return "nil"
 		},
+		"extractTypeFieldsAsString": func(schema *Schema, typ *ast.Type) string {
+			objTyp := schema.Objects[typ.Name()]
+			if objTyp == nil {
+				return ""
+			}
+			fieldsStr := "{\n"
+			for _, field := range objTyp.Fields {
+				if len(field.Arguments) != 0 {
+					continue
+				}
+				fieldStr := field.Name
+				if obj := schema.Objects[field.Type.Name()]; obj != nil {
+					fieldStr += " { \n"
+					for _, objField := range obj.Fields {
+						fieldStr += "\t\t\t\t" + objField.Name + "\n"
+					}
+					fieldStr += "\t\t\t}"
+				}
+				fieldsStr += "\t\t\t" + fieldStr + "\n"
+			}
+			fieldsStr += "\t\t}"
+			return fieldsStr
+		},
 	}
 )
 
