@@ -7,6 +7,7 @@ import (
     "context"
     "fmt"
     "github.com/machinebox/graphql"
+	"github.com/wisdommatt/sdkgen/graphql/options"
 )
 
 {{ $schema := . }}
@@ -87,16 +88,17 @@ type Subscriptions interface {
 type GqlClient struct {
     Mutation *Mutation
     Query *Query
+    config options.ClientConfig
 }
 
 // NewClient returns a new graphql client.
-func NewClient(mutationUrl, queryUrl, subscriptionUrl string) *GqlClient {
+func NewClient(config options.ClientConfig) *GqlClient {
     return &GqlClient{
         Mutation: &Mutation{
-            graphClient: graphql.NewClient(mutationUrl),
+            graphClient: graphql.NewClient(config.MutationURL),
         },
         Query: &Query{
-            graphClient: graphql.NewClient(mutationUrl),
+            graphClient: graphql.NewClient(config.QueryURL),
         },
     }
 }
