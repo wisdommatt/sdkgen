@@ -86,12 +86,16 @@ type Subscriptions interface {
 // GraphqlClient interface.
 type GqlClient struct {
     Mutation *Mutation
+    Query *Query
 }
 
 // NewClient returns a new graphql client.
 func NewClient(mutationUrl, queryUrl, subscriptionUrl string) *GqlClient {
     return &GqlClient{
         Mutation: &Mutation{
+            graphClient: graphql.NewClient(mutationUrl),
+        },
+        Query: &Query{
             graphClient: graphql.NewClient(mutationUrl),
         },
     }
@@ -120,5 +124,31 @@ type Mutation struct {
             return {{ nilValue $responseName $mutation.Type }}, err
         }
         return {{ toLowerCamel $mutation.Name }}Response["{{ $mutation.Name }}"], nil
+    }
+{{ end }}{{ end }}
+
+type Query struct {
+	graphClient *graphql.Client
+}
+
+{{ range $query := $schema.Queries }} 
+{{ if isExported $query.Name }} 
+    {{ $responseName := extractFieldTypeName $schema $query.Name $query.Type }}
+    {{ $pointerResponse := toPointerTypeName $schema $responseName $query.Type }}
+    func (q *Query) {{ toCamelCase $query.Name }}(ctx context.Context, {{ range $arg := $query.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }} gqlFields string) ({{ $pointerResponse }}, error) {
+        req := graphql.NewRequest(fmt.Sprintf(`
+            query({{ range $arg := $query.Arguments }}${{ $arg.Name }}: {{ $arg.Type }}, {{ end }}) {
+                {{ $query.Name }}({{ range $arg := $query.Arguments }}{{ $arg.Name }}: ${{ $arg.Name }}, {{ end }}) %s
+            }
+        `, gqlFields))
+        {{ range $arg := $query.Arguments }} req.Var("{{ $arg.Name }}", {{ $arg.Name }})
+        {{ end }}
+
+        var {{ toLowerCamel $query.Name }}Response map[string]{{ $pointerResponse }}
+        err := q.graphClient.Run(ctx, req, &{{ toLowerCamel $query.Name }}Response)
+        if err != nil {
+            return {{ nilValue $responseName $query.Type }}, err
+        }
+        return {{ toLowerCamel $query.Name }}Response["{{ $query.Name }}"], nil
     }
 {{ end }}{{ end }}
