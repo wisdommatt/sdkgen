@@ -188,8 +188,8 @@ func parseSchema(schema *Schema) *Schema {
 
 // GenerateSDKClient generates a graphql sdk client from schema.
 func GenerateSDKClient(schema *Schema, outFile string) error {
-	clientTmp, err := template.New("client.go.tpl").Funcs(templateFuncs).
-		ParseFiles("graphql/templates/client.go.tpl")
+	clientTmp, err := template.New("client.go.tmpl").Funcs(templateFuncs).
+		ParseFiles("graphql/templates/client.go.tmpl")
 	if err != nil {
 		return err
 	}
