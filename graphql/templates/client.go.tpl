@@ -7,7 +7,6 @@ import (
     "context"
     "fmt"
     "github.com/machinebox/graphql"
-	"github.com/wisdommatt/sdkgen/graphql/options"
 )
 
 {{ $schema := . }}
@@ -83,16 +82,25 @@ type Subscriptions interface {
     {{ end }}{{ end }}
 }
 
+// ClientConfig is the config used for creating a new
+// graphql client.
+type ClientConfig struct {
+	MutationURL        string
+	QueryURL           string
+	SubscriptionURL    string
+	DefaultHTTPHeaders map[string]string
+}
+
 // GqlClient is the default implementation for 
 // GraphqlClient interface.
 type GqlClient struct {
     Mutation *Mutation
     Query *Query
-    config options.ClientConfig
+    config ClientConfig
 }
 
 // NewClient returns a new graphql client.
-func NewClient(config options.ClientConfig) *GqlClient {
+func NewClient(config ClientConfig) *GqlClient {
     return &GqlClient{
         Mutation: &Mutation{
             graphClient: graphql.NewClient(config.MutationURL),
