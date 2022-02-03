@@ -100,7 +100,7 @@ type Mutation struct {
 {{ range $mutation := $schema.Mutations }} 
 {{ if isExported $mutation.Name }} 
     {{ $responseName := extractFieldTypeName $schema $mutation.Name $mutation.Type }}
-    {{ $pointerResponse := toPointerTypeName $responseName $mutation.Type }}
+    {{ $pointerResponse := toPointerTypeName $schema $responseName $mutation.Type }}
     func (m *Mutation) {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ $pointerResponse }}, error) {
         req := graphql.NewRequest(`
             mutation({{ range $arg := $mutation.Arguments }}${{ $arg.Name }}: {{ $arg.Type }}, {{ end }}) {

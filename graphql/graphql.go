@@ -109,8 +109,11 @@ var (
 		"toLowerCamel": func(str string) string {
 			return strcase.ToLowerCamel(str)
 		},
-		"toPointerTypeName": func(name string, typ *ast.Type) string {
+		"toPointerTypeName": func(schema *Schema, name string, typ *ast.Type) string {
 			if _, ok := builtInTypesMap[name]; ok {
+				return name
+			}
+			if _, ok := schema.Unions[name]; ok {
 				return name
 			}
 			if typ.Elem != nil || !typ.NonNull {
