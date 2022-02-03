@@ -104,15 +104,18 @@ func NewClient(config ClientConfig) *GqlClient {
     return &GqlClient{
         Mutation: &Mutation{
             graphClient: graphql.NewClient(config.MutationURL),
+            defaultHTTPHeaders: config.DefaultHTTPHeaders,
         },
         Query: &Query{
             graphClient: graphql.NewClient(config.QueryURL),
+            defaultHTTPHeaders: config.DefaultHTTPHeaders,
         },
     }
 }
 
 type Mutation struct {
 	graphClient *graphql.Client
+    defaultHTTPHeaders map[string]string
 }
 
 {{ range $mutation := $schema.Mutations }} 
@@ -128,6 +131,10 @@ type Mutation struct {
         {{ range $arg := $mutation.Arguments }} req.Var("{{ $arg.Name }}", {{ $arg.Name }})
         {{ end }}
 
+        for key, value := range m.defaultHTTPHeaders {
+            req.Header.Set(key, value)
+        }
+
         var {{ toLowerCamel $mutation.Name }}Response map[string]{{ $pointerResponse }}
         err := m.graphClient.Run(ctx, req, &{{ toLowerCamel $mutation.Name }}Response)
         if err != nil {
@@ -139,6 +146,7 @@ type Mutation struct {
 
 type Query struct {
 	graphClient *graphql.Client
+    defaultHTTPHeaders map[string]string
 }
 
 {{ range $query := $schema.Queries }} 
@@ -153,6 +161,10 @@ type Query struct {
         `, gqlFields))
         {{ range $arg := $query.Arguments }} req.Var("{{ $arg.Name }}", {{ $arg.Name }})
         {{ end }}
+
+        for key, value := range q.defaultHTTPHeaders {
+            req.Header.Set(key, value)
+        }
 
         var {{ toLowerCamel $query.Name }}Response map[string]{{ $pointerResponse }}
         err := q.graphClient.Run(ctx, req, &{{ toLowerCamel $query.Name }}Response)
