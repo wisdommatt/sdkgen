@@ -6,6 +6,7 @@ import (
     "time"
     "context"
     "fmt"
+    "strings"
     "github.com/machinebox/graphql"
 )
 
@@ -141,7 +142,7 @@ type Mutation struct {
         var {{ toLowerCamel $mutation.Name }}Response map[string]{{ $pointerResponse }}
         err := m.graphClient.Run(ctx, req, &{{ toLowerCamel $mutation.Name }}Response)
         if err != nil {
-            return {{ nilValue $responseName $mutation.Type }}, err
+            return {{ nilValue $responseName $mutation.Type }}, parseGqlError(err)
         }
         return {{ toLowerCamel $mutation.Name }}Response["{{ $mutation.Name }}"], nil
     }
@@ -172,8 +173,18 @@ type Query struct {
         var {{ toLowerCamel $query.Name }}Response map[string]{{ $pointerResponse }}
         err := q.graphClient.Run(ctx, req, &{{ toLowerCamel $query.Name }}Response)
         if err != nil {
-            return {{ nilValue $responseName $query.Type }}, err
+            return {{ nilValue $responseName $query.Type }}, parseGqlError(err)
         }
         return {{ toLowerCamel $query.Name }}Response["{{ $query.Name }}"], nil
     }
 {{ end }}{{ end }}
+
+func parseGqlError(err error) error {
+    if err != nil && err.Error() != "" {
+        errMsg := err.Error()
+        if strings.HasPrefix(errMsg, "graphql: ") {
+            return errors.New(errMsg[9:])
+        }
+    }
+    return err
+}
