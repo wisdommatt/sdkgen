@@ -5,6 +5,7 @@ package example
 import (
     "time"
     "context"
+    "fmt"
     "github.com/machinebox/graphql"
 )
 
@@ -87,26 +88,29 @@ type GqlClient struct {
     Mutation *Mutation
 }
 
-// NewGraphqlClient returns a new graphql client.
-func NewGraphqlClient() *GqlClient {
-    return &GqlClient{}
+// NewClient returns a new graphql client.
+func NewClient(mutationUrl, queryUrl, subscriptionUrl string) *GqlClient {
+    return &GqlClient{
+        Mutation: &Mutation{
+            graphClient: graphql.NewClient(mutationUrl),
+        },
+    }
 }
 
 type Mutation struct {
 	graphClient *graphql.Client
-    url string
 }
 
 {{ range $mutation := $schema.Mutations }} 
 {{ if isExported $mutation.Name }} 
     {{ $responseName := extractFieldTypeName $schema $mutation.Name $mutation.Type }}
     {{ $pointerResponse := toPointerTypeName $schema $responseName $mutation.Type }}
-    func (m *Mutation) {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ $pointerResponse }}, error) {
-        req := graphql.NewRequest(`
+    func (m *Mutation) {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }} gqlFields string) ({{ $pointerResponse }}, error) {
+        req := graphql.NewRequest(fmt.Sprintf(`
             mutation({{ range $arg := $mutation.Arguments }}${{ $arg.Name }}: {{ $arg.Type }}, {{ end }}) {
-                {{ $mutation.Name }}({{ range $arg := $mutation.Arguments }}{{ $arg.Name }}: ${{ $arg.Name }}, {{ end }})
+                {{ $mutation.Name }}({{ range $arg := $mutation.Arguments }}{{ $arg.Name }}: ${{ $arg.Name }}, {{ end }}) %s
             }
-        `)
+        `, gqlFields))
         {{ range $arg := $mutation.Arguments }} req.Var("{{ $arg.Name }}", {{ $arg.Name }})
         {{ end }}
 
