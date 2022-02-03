@@ -48,6 +48,13 @@ var (
 		"Email":   "string",
 	}
 
+	builtInTypesMap = map[string]string{
+		"int":     "0",
+		"string":  "",
+		"float64": "0",
+		"bool":    "false",
+	}
+
 	templateFuncs = template.FuncMap{
 		"extractFieldTypeName": func(schema *Schema, name string, typ *ast.Type) string {
 			fieldType := strings.ReplaceAll(typ.Name(), "!", "")
@@ -98,6 +105,24 @@ var (
 		},
 		"isExported": func(str string) bool {
 			return !strings.HasPrefix(str, "_")
+		},
+		"toLowerCamel": func(str string) string {
+			return strcase.ToLowerCamel(str)
+		},
+		"toPointerTypeName": func(name string, typ *ast.Type) string {
+			if _, ok := builtInTypesMap[name]; ok {
+				return name
+			}
+			if typ.Elem != nil || !typ.NonNull {
+				return name
+			}
+			return "*" + name
+		},
+		"nilValue": func(typeName string, typ *ast.Type) string {
+			if value, ok := builtInTypesMap[typeName]; ok {
+				return value
+			}
+			return "nil"
 		},
 	}
 )
