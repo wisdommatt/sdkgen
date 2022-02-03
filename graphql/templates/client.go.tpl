@@ -20,6 +20,9 @@ type {{ $unionName }} interface {
     Is{{ $unionName }}()
 }
 
+{{ range $type := $union.Types }}func (u {{ toCamelCase $type }}) Is{{ $unionName }}() {}
+{{ end }}
+
 {{ end }}
 
 {{/* Generating Go types for graphql Enums */}}
