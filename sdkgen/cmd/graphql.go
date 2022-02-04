@@ -16,10 +16,10 @@ limitations under the License.
 package cmd
 
 import (
-	"log"
-
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/wisdommatt/sdkgen/graphql"
+	"github.com/wisdommatt/sdkgen/pkg/log"
 )
 
 // graphqlCmd represents the graphql command
@@ -30,21 +30,21 @@ var graphqlCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		schemaFile, _ := cmd.Flags().GetString("schema")
 		if schemaFile == "" {
-			log.Fatal("'schema' is required *")
+			log.Fatalln(color.FgRed, "ERROR", "--schema is required")
 		}
 		output, _ := cmd.Flags().GetString("output")
 		if output == "" {
-			log.Fatal("'output' is required *")
+			log.Fatalln(color.FgRed, "ERROR", "--output is required")
 		}
 		graphqlSchema, err := graphql.LoadGraphqlSchema(schemaFile)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Fatalln(color.FgRed, "ERROR", err.Error())
 		}
 		err = graphql.GenerateSDKClient(graphqlSchema, output)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln(color.FgRed, "ERROR", err.Error())
 		}
-		log.Println("API SDK generated successfully")
+		log.Fatalln(color.FgGreen, "COMPLETED", "API SDK generated successfully")
 	},
 }
 
