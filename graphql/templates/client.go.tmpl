@@ -190,6 +190,22 @@ func parseGqlError(err error) error {
     return err
 }
 
-{{/* TODO(wisdommatt): generate helper functions for converting builtin pointer types to raw type
-    e.g StringP(str string) *string
- */}}
+func StringP(str string) *string {
+    return &str
+}
+
+func IntP(i int) *int {
+    return &i
+}
+
+func FloatP(f float64) *float64 {
+    return &f
+}
+
+func BoolP(b bool) *bool {
+    return &b
+}
+
+func TimeP(t time.Time) *time.Time {
+    return &t
+}
