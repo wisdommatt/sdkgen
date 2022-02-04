@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"text/template"
@@ -126,6 +127,15 @@ var (
 				return value
 			}
 			return "nil"
+		},
+		"extractGoComment": func(typ *ast.Definition) string {
+			description := strings.TrimSpace(typ.Description)
+			if description == "" {
+				return ""
+			}
+			name := strcase.ToCamel(typ.Name)
+			comment := fmt.Sprintf("// %s %s", name, description)
+			return comment
 		},
 	}
 )

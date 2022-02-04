@@ -624,7 +624,7 @@ input LessonnoteFilter {
   teacherId: String
 }
 
-#
+""" contains available lessonnote teacher status. """
 enum LessonnoteTeacherStatus {
   #
   Draft
@@ -2193,7 +2193,7 @@ input UpdateUser {
   city: String
 }
 
-#
+""" contains all available user types. """
 union User = Staff | Student | Parent
 
 #
