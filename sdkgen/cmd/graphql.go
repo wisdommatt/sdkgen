@@ -36,11 +36,7 @@ var graphqlCmd = &cobra.Command{
 		if output == "" {
 			log.Fatalln(color.FgRed, "ERROR", "--output is required")
 		}
-		graphqlSchema, err := graphql.LoadGraphqlSchema(schemaFile)
-		if err != nil {
-			log.Fatalln(color.FgRed, "ERROR", err.Error())
-		}
-		err = graphql.GenerateSDKClient(graphqlSchema, output)
+		err := graphql.GenerateGoSDK(schemaFile, output)
 		if err != nil {
 			log.Fatalln(color.FgRed, "ERROR", err.Error())
 		}
