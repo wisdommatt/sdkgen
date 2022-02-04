@@ -674,7 +674,7 @@ type Message {
 
 #
 type Mutation {
-  #
+  """ is the mutation for authenticating user """
   authLogin(userName: String!, password: String!): LoginResponse!
 
   #
@@ -1381,7 +1381,7 @@ type ParentRelation {
 
 #
 type Query {
-  #
+  """ query to retrieve user by id """
   user(id: String!): User!
 
   #

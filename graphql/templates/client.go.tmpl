@@ -126,7 +126,7 @@ type Mutation struct {
 {{ if isExported $mutation.Name }} 
     {{ $responseName := extractFieldTypeName $schema $mutation.Name $mutation.Type }}
     {{ $pointerResponse := toPointerTypeName $schema $responseName $mutation.Type }}
-    func (m *Mutation) {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }} gqlFields string) ({{ $pointerResponse }}, error) {
+    {{ extractGoComment $mutation.Name $mutation.Description }} func (m *Mutation) {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }} gqlFields string) ({{ $pointerResponse }}, error) {
         req := graphql.NewRequest(fmt.Sprintf(`
             mutation({{ range $arg := $mutation.Arguments }}${{ $arg.Name }}: {{ $arg.Type }}, {{ end }}) {
                 {{ $mutation.Name }}({{ range $arg := $mutation.Arguments }}{{ $arg.Name }}: ${{ $arg.Name }}, {{ end }}) %s
@@ -157,7 +157,7 @@ type Query struct {
 {{ if isExported $query.Name }} 
     {{ $responseName := extractFieldTypeName $schema $query.Name $query.Type }}
     {{ $pointerResponse := toPointerTypeName $schema $responseName $query.Type }}
-    func (q *Query) {{ toCamelCase $query.Name }}(ctx context.Context, {{ range $arg := $query.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }} gqlFields string) ({{ $pointerResponse }}, error) {
+    {{ extractGoComment $query.Name $query.Description }} func (q *Query) {{ toCamelCase $query.Name }}(ctx context.Context, {{ range $arg := $query.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }} gqlFields string) ({{ $pointerResponse }}, error) {
         req := graphql.NewRequest(fmt.Sprintf(`
             query({{ range $arg := $query.Arguments }}${{ $arg.Name }}: {{ $arg.Type }}, {{ end }}) {
                 {{ $query.Name }}({{ range $arg := $query.Arguments }}{{ $arg.Name }}: ${{ $arg.Name }}, {{ end }}) %s
