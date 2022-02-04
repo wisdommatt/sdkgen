@@ -599,7 +599,7 @@ enum LessonnoteCommentStatus {
 
 #
 input LessonnoteFilter {
-  #
+  """ this is the class id for filtering by class id """
   classId: String
 
   #

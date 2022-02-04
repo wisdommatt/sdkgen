@@ -128,13 +128,13 @@ var (
 			}
 			return "nil"
 		},
-		"extractGoComment": func(typ *ast.Definition) string {
-			description := strings.TrimSpace(typ.Description)
+		"extractGoComment": func(name, description string) string {
+			description = strings.TrimSpace(description)
 			if description == "" {
 				return ""
 			}
-			name := strcase.ToCamel(typ.Name)
-			comment := fmt.Sprintf("// %s %s", name, description)
+			name = strcase.ToCamel(name)
+			comment := fmt.Sprintf("// %s %s \n", name, description)
 			return comment
 		},
 	}

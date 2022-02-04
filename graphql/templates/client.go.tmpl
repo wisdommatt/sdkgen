@@ -16,8 +16,7 @@ import (
 {{ range $union := .Unions }}
 
 {{ $unionName := toCamelCase $union.Name }}
-{{ extractGoComment $union }}
-type {{ $unionName }} interface {
+{{ extractGoComment $union.Name $union.Description }} type {{ $unionName }} interface {
     Is{{ $unionName }}()
 }
 
@@ -31,8 +30,7 @@ type {{ $unionName }} interface {
 {{ if isExported $enum.Name }}
 {{ $enumName := toCamelCase $enum.Name }}
 
-{{ extractGoComment $enum }}
-type {{ $enumName }} string
+{{ extractGoComment $enum.Name $enum.Description }} type {{ $enumName }} string
 
 var (
     {{ range $val := $enum.EnumValues }} {{ $enumName }}{{ toCamelCase $val.Name }} {{ $enumName }} = "{{ toCamelCase $val.Name }}"
@@ -57,9 +55,8 @@ func (e {{ $enumName }}) String() string {
 {{ range $val := .Objects }}
 {{ if isExported $val.Name }}
 
-{{ extractGoComment $val }}
-type {{ $val.Name }} struct {
-    {{ range $field := $val.Fields }} {{ if and (isExported $field.Name) (isExported $field.Type.Name) }} {{ toCamelCase $field.Name }} {{ extractFieldTypeName $schema $field.Name $field.Type }} `json:"{{ $field.Name }}"` {{ end }}
+{{ extractGoComment $val.Name $val.Description }} type {{ $val.Name }} struct {
+    {{ range $field := $val.Fields }} {{ extractGoComment $field.Name $field.Description }} {{ if and (isExported $field.Name) (isExported $field.Type.Name) }} {{ toCamelCase $field.Name }} {{ extractFieldTypeName $schema $field.Name $field.Type }} `json:"{{ $field.Name }}"` {{ end }}
     {{ end }}
 }
 {{ end }}
