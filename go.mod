@@ -3,6 +3,7 @@ module github.com/wisdommatt/sdkgen
 go 1.16
 
 require (
+	github.com/fatih/color v1.13.0 // indirect
 	github.com/iancoleman/strcase v0.2.0
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
