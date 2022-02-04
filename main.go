@@ -7,8 +7,7 @@ import (
 )
 
 func main() {
-	schema, _ := graphql.LoadGraphqlSchema("sample.graphql")
-	err := graphql.GenerateSDKClient(schema, "sample-gen/example.go")
+	err := graphql.GenerateGoSDK("sample.graphql", "sample-gen/example.go")
 	if err != nil {
 		log.Fatal(err)
 	}

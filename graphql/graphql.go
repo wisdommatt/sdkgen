@@ -196,8 +196,17 @@ func parseSchema(schema *Schema) *Schema {
 	return schema
 }
 
-// GenerateSDKClient generates a graphql sdk client from schema.
-func GenerateSDKClient(schema *Schema, outFile string) error {
+// GenerateGoSDK generates a Go graphql sdk client from schema file.
+func GenerateGoSDK(schemaFile string, outputDirectory string) error {
+	schema, err := LoadGraphqlSchema(schemaFile)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(outputDirectory, 0700)
+	if err != nil {
+		return err
+	}
+	outFile := outputDirectory + "/client.go"
 	clientTmp, err := template.New("client.go.tmpl").Funcs(templateFuncs).
 		ParseFiles("graphql/templates/client.go.tmpl")
 	if err != nil {
@@ -212,5 +221,5 @@ func GenerateSDKClient(schema *Schema, outFile string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(outFile, res, 0666)
+	return os.WriteFile(outFile, res, 0700)
 }
