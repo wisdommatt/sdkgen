@@ -1,6 +1,8 @@
 package openapi
 
 import (
+	"bytes"
+	"html/template"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -85,6 +87,10 @@ type OpenAPISchema struct {
 	Swagger             string                        `json:"swagger"`
 }
 
+var (
+	templateFuncs template.FuncMap = template.FuncMap{}
+)
+
 // LoadOpenApiSchema loads open api schema from api schema file.
 func LoadOpenApiSchema(filePath string) (*OpenAPISchema, error) {
 	fileContents, err := os.ReadFile(filePath)
@@ -97,4 +103,27 @@ func LoadOpenApiSchema(filePath string) (*OpenAPISchema, error) {
 		return nil, err
 	}
 	return &schema, nil
+}
+
+// GenerateGoSDK generates a Go api sdk from an openapi schema file.
+func GenerateGoSDK(schemaFile string, outDir string) error {
+	err := os.MkdirAll(outDir, 0700)
+	if err != nil {
+		return err
+	}
+	schema, err := LoadOpenApiSchema(schemaFile)
+	if err != nil {
+		return err
+	}
+	outFile := outDir + "/client.go"
+	t, err := template.New("client.go.tmpl").Funcs(templateFuncs).ParseFiles("openapi/templates/client.go.tmpl")
+	if err != nil {
+		return err
+	}
+	buffer := &bytes.Buffer{}
+	err = t.Execute(buffer, schema)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(outFile, buffer.Bytes(), 0700)
 }
