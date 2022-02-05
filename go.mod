@@ -13,4 +13,5 @@ require (
 	github.com/spf13/viper v1.10.1
 	github.com/vektah/gqlparser v1.3.1
 	golang.org/x/tools v0.1.9
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

@@ -11,4 +11,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// schema, err := openapi.LoadOpenApiSchema("openapi-sample.yaml")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// log.Println(schema.Paths)
 }
