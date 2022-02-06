@@ -11,20 +11,31 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type DefinitionProperty struct {
-	Description string      `json:"description" yaml:"description"`
-	Type        string      `json:"type" yaml:"type"`
-	Example     interface{} `json:"example" yaml:"example"`
-	XGoName     string      `json:"x-go-name" yaml:"x-go-name"`
-	Ref         string      `json:"$ref" yaml:"$ref"`
+type Property struct {
+	Description          string      `json:"description" yaml:"description"`
+	Type                 string      `json:"type" yaml:"type"`
+	Example              interface{} `json:"example" yaml:"example"`
+	XGoName              string      `json:"x-go-name" yaml:"x-go-name"`
+	Ref                  string      `json:"$ref" yaml:"$ref"`
+	Format               string      `json:"format" yaml:"format"`
+	AdditionalProperties struct {
+		AdditionalProperties struct {
+			Type string `json:"type"`
+			Ref  string `json:"$ref" yaml:"$ref"`
+		} `json:"additionalProperties" yaml:"additionalProperties"`
+	} `json:"additionalProperties" yaml:"additionalProperties"`
+	Items struct {
+		Type string `json:"type" yaml:"type"`
+		Ref  string `json:"$ref" yaml:"$ref"`
+	} `json:"items" yaml:"items"`
 }
 
 type Definition struct {
-	Description string                        `json:"description" yaml:"description"`
-	Properties  map[string]DefinitionProperty `json:"properties" yaml:"properties"`
-	Required    []string                      `json:"required" yaml:"required"`
-	Type        string                        `json:"type" yaml:"type"`
-	XGoPackage  string                        `json:"x-go-package" yaml:"x-go-package"`
+	Description string              `json:"description" yaml:"description"`
+	Properties  map[string]Property `json:"properties" yaml:"properties"`
+	Required    []string            `json:"required" yaml:"required"`
+	Type        string              `json:"type" yaml:"type"`
+	XGoPackage  string              `json:"x-go-package" yaml:"x-go-package"`
 }
 
 type Info struct {
@@ -60,18 +71,11 @@ type Response struct {
 }
 
 type ResponseSchema struct {
-	Properties map[string]ResponseSchemaProperty `json:"properties" yaml:"properties"`
-	Required   []string                          `json:"required" yaml:"required"`
-	Type       string                            `json:"type" yaml:"type"`
-	Ref        string                            `json:"$ref" yaml:"$ref"`
-}
-
-type ResponseSchemaProperty struct {
-	Description string `json:"description" yaml:"description"`
-	Example     string `json:"example" yaml:"example"`
-	Type        string `json:"type" yaml:"type"`
-	XGoName     string `json:"x-go-name" yaml:"x-go-name"`
-	Ref         string `json:"$ref" yaml:"$ref"`
+	Properties map[string]Property `json:"properties" yaml:"properties"`
+	Required   []string            `json:"required" yaml:"required"`
+	Type       string              `json:"type" yaml:"type"`
+	Ref        string              `json:"$ref" yaml:"$ref"`
+	Format     string              `json:"format" yaml:"format"`
 }
 
 type OpenAPISchema struct {
@@ -95,26 +99,46 @@ type SecurityDefinition struct {
 
 var (
 	builtInTypesMap = map[string]string{
-		"string":  "string",
-		"boolean": "bool",
-		"integer": "int",
-		"number":  "float64",
+		"string":    "string",
+		"boolean":   "bool",
+		"integer":   "int",
+		"number":    "float64",
+		"date-time": "time.Time",
+		"double":    "float64",
+		"int64":     "int",
 	}
 
 	templateFuncs template.FuncMap = template.FuncMap{
 		"toCamelCase": func(str string) string {
 			return strcase.ToCamel(str)
 		},
-		"extractTypeName": func(schema *OpenAPISchema, parentName, name, ref string) string {
-			if typeName, ok := builtInTypesMap[name]; ok {
-				return typeName
+		"extractTypeName": func(schema *OpenAPISchema, parentName string, property Property) string {
+			res := property.Type
+			if property.Format != "" {
+				res = property.Format
 			}
-			if refName, ok := schema.RefMap[ref]; ok {
+			if typeName, ok := builtInTypesMap[res]; ok {
+				res = typeName
+			}
+			if refName, ok := schema.RefMap[property.Ref]; ok {
 				// return non-required types as pointers
 				if refName == parentName {
-					return "*" + strcase.ToCamel(refName)
+					res = "*" + strcase.ToCamel(refName)
+				} else {
+					res = strcase.ToCamel(refName)
 				}
-				return strcase.ToCamel(refName)
+			}
+			if property.Type != "array" && res != "object" {
+				return res
+			}
+			if property.Items.Type != "" {
+				res = property.Items.Type
+			}
+			if refName, ok := schema.RefMap[property.Items.Ref]; ok {
+				res = strcase.ToCamel(refName)
+			}
+			if res != "object" {
+				return "[]" + res
 			}
 			return "interface{}"
 		},
