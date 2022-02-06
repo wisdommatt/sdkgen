@@ -11,83 +11,83 @@ import (
 )
 
 type DefinitionProperty struct {
-	Description string      `json:"description"`
-	Type        string      `json:"type"`
-	Example     interface{} `json:"example"`
-	XGoName     string      `json:"x-go-name"`
-	Ref         string      `json:"$ref"`
+	Description string      `json:"description" yaml:"description"`
+	Type        string      `json:"type" yaml:"type"`
+	Example     interface{} `json:"example" yaml:"example"`
+	XGoName     string      `json:"x-go-name" yaml:"x-go-name"`
+	Ref         string      `json:"$ref" yaml:"$ref"`
 }
 
 type Definition struct {
-	Description string                        `json:"description"`
-	Properties  map[string]DefinitionProperty `json:"properties"`
-	Required    []string                      `json:"required"`
-	Type        string                        `json:"type"`
-	XGoPackage  string                        `json:"x-go-package"`
+	Description string                        `json:"description" yaml:"description"`
+	Properties  map[string]DefinitionProperty `json:"properties" yaml:"properties"`
+	Required    []string                      `json:"required" yaml:"required"`
+	Type        string                        `json:"type" yaml:"type"`
+	XGoPackage  string                        `json:"x-go-package" yaml:"x-go-package"`
 }
 
 type Info struct {
-	Description string `json:"description"`
-	Title       string `json:"title"`
-	Version     string `json:"version"`
+	Description string `json:"description" yaml:"description"`
+	Title       string `json:"title" yaml:"title"`
+	Version     string `json:"version" yaml:"version"`
 }
 
 type Path struct {
-	Description string              `json:"description"`
-	OperationID string              `json:"operationId"`
-	Parameters  []PathParameter     `json:"parameters"`
-	Responses   map[int]RefSchema   `json:"responses"`
-	Summary     string              `json:"summary"`
-	Tags        []string            `json:"tags"`
-	Security    map[string][]string `json:"security"`
+	Description string              `json:"description" yaml:"description"`
+	OperationID string              `json:"operationId" yaml:"operationId"`
+	Parameters  []PathParameter     `json:"parameters" yaml:"parameters"`
+	Responses   map[int]RefSchema   `json:"responses" yaml:"responses"`
+	Summary     string              `json:"summary" yaml:"summary"`
+	Tags        []string            `json:"tags" yaml:"tags"`
+	Security    map[string][]string `json:"security" yaml:"security"`
 }
 
 type PathParameter struct {
-	In       string    `json:"in"`
-	Name     string    `json:"name"`
-	Required bool      `json:"required"`
-	Schema   RefSchema `json:"schema"`
+	In       string    `json:"in" yaml:"in"`
+	Name     string    `json:"name" yaml:"name"`
+	Required bool      `json:"required" yaml:"required"`
+	Schema   RefSchema `json:"schema" yaml:"schema"`
 }
 
 type RefSchema struct {
-	Ref string `json:"$ref"`
+	Ref string `json:"$ref" yaml:"$ref"`
 }
 
 type Response struct {
-	Description string         `json:"description"`
-	Schema      ResponseSchema `json:"schema"`
+	Description string         `json:"description" yaml:"description"`
+	Schema      ResponseSchema `json:"schema" yaml:"schema"`
 }
 
 type ResponseSchema struct {
-	Properties map[string]ResponseSchemaProperty `json:"properties"`
-	Required   []string                          `json:"required"`
-	Type       string                            `json:"type"`
-	Ref        string                            `json:"$ref"`
+	Properties map[string]ResponseSchemaProperty `json:"properties" yaml:"properties"`
+	Required   []string                          `json:"required" yaml:"required"`
+	Type       string                            `json:"type" yaml:"type"`
+	Ref        string                            `json:"$ref" yaml:"$ref"`
 }
 
 type ResponseSchemaProperty struct {
-	Description string `json:"description"`
-	Example     string `json:"example"`
-	Type        string `json:"type"`
-	XGoName     string `json:"x-go-name"`
+	Description string `json:"description" yaml:"description"`
+	Example     string `json:"example" yaml:"example"`
+	Type        string `json:"type" yaml:"type"`
+	XGoName     string `json:"x-go-name" yaml:"x-go-name"`
 }
 
 type SecurityDefinition struct {
-	Type string `json:"type"`
+	Type string `json:"type" yaml:"type"`
 }
 
 type OpenAPISchema struct {
-	BasePath            string                        `json:"basePath"`
-	Consumes            []string                      `json:"consumes"`
-	Definitions         map[string]Definition         `json:"definitions"`
-	Host                string                        `json:"host"`
-	Info                Info                          `json:"info"`
-	Paths               map[string]Path               `json:"paths"`
-	Produces            []string                      `json:"produces"`
-	Responses           map[string]Response           `json:"responses"`
-	Schemes             []string                      `json:"schemes"`
-	SecurityDefinitions map[string]SecurityDefinition `json:"securityDefinitions"`
-	Swagger             string                        `json:"swagger"`
+	BasePath            string                        `json:"basePath" yaml:"basePath"`
+	Consumes            []string                      `json:"consumes" yaml:"consumes"`
+	Definitions         map[string]Definition         `json:"definitions" yaml:"definitions"`
+	Host                string                        `json:"host" yaml:"host"`
+	Info                Info                          `json:"info" yaml:"info"`
+	Paths               map[string]Path               `json:"paths" yaml:"paths"`
+	Produces            []string                      `json:"produces" yaml:"produces"`
+	Responses           map[string]Response           `json:"responses" yaml:"responses"`
+	Schemes             []string                      `json:"schemes" yaml:"schemes"`
+	SecurityDefinitions map[string]SecurityDefinition `json:"securityDefinitions" yaml:"securityDefinitions"`
+	Swagger             string                        `json:"swagger" yaml:"swagger"`
 }
 
 var (
