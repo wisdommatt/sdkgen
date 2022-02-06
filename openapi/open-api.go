@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"os"
 
+	"github.com/iancoleman/strcase"
 	"gopkg.in/yaml.v2"
 )
 
@@ -13,6 +14,7 @@ type DefinitionProperty struct {
 	Type        string      `json:"type"`
 	Example     interface{} `json:"example"`
 	XGoName     string      `json:"x-go-name"`
+	Ref         string      `json:"$ref"`
 }
 
 type Definition struct {
@@ -88,7 +90,24 @@ type OpenAPISchema struct {
 }
 
 var (
-	templateFuncs template.FuncMap = template.FuncMap{}
+	builtInTypesMap = map[string]string{
+		"string":  "string",
+		"boolean": "bool",
+		"integer": "int",
+		"number":  "float64",
+	}
+
+	templateFuncs template.FuncMap = template.FuncMap{
+		"toCamelCase": func(str string) string {
+			return strcase.ToCamel(str)
+		},
+		"extractTypeName": func(name, ref string) string {
+			if typeName, ok := builtInTypesMap[name]; ok {
+				return typeName
+			}
+			return "interface{}"
+		},
+	}
 )
 
 // LoadOpenApiSchema loads open api schema from api schema file.

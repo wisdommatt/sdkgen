@@ -2,3 +2,15 @@
 
 package client
 
+{{ $schema := . }}
+
+{{ range $name, $definition := $schema.Definitions }}
+{{ if eq $definition.Type "object" }}
+
+type {{ toCamelCase $name }} struct {
+    {{ range $propName, $prop := $definition.Properties }} {{ toCamelCase $propName }} {{ extractTypeName $prop.Type $prop.Ref }} `json:"{{ $propName }}"` 
+    {{ end }}
+}
+
+{{ end }}
+{{ end }}
