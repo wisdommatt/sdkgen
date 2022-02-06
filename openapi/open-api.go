@@ -2,6 +2,7 @@ package openapi
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"os"
 
@@ -85,6 +86,7 @@ type OpenAPISchema struct {
 	Schemes             []string                      `json:"schemes" yaml:"schemes"`
 	SecurityDefinitions map[string]SecurityDefinition `json:"securityDefinitions" yaml:"securityDefinitions"`
 	Swagger             string                        `json:"swagger" yaml:"swagger"`
+	RefMap              map[string]string
 }
 
 type SecurityDefinition struct {
@@ -118,10 +120,20 @@ func LoadOpenApiSchema(filePath string) (*OpenAPISchema, error) {
 	if err != nil {
 		return nil, err
 	}
-	var schema OpenAPISchema
+	schema := OpenAPISchema{
+		RefMap: make(map[string]string),
+	}
 	err = yaml.Unmarshal(fileContents, &schema)
 	if err != nil {
 		return nil, err
+	}
+	for name := range schema.Definitions {
+		key := fmt.Sprintf("#/definitions/%s", name)
+		schema.RefMap[key] = name
+	}
+	for name := range schema.Responses {
+		key := fmt.Sprintf("#/responses/%s", name)
+		schema.RefMap[key] = name
 	}
 	return &schema, nil
 }
