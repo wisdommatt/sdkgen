@@ -105,9 +105,16 @@ var (
 		"toCamelCase": func(str string) string {
 			return strcase.ToCamel(str)
 		},
-		"extractTypeName": func(name, ref string) string {
+		"extractTypeName": func(schema *OpenAPISchema, parentName, name, ref string) string {
 			if typeName, ok := builtInTypesMap[name]; ok {
 				return typeName
+			}
+			if refName, ok := schema.RefMap[ref]; ok {
+				// return non-required types as pointers
+				if refName == parentName {
+					return "*" + strcase.ToCamel(refName)
+				}
+				return strcase.ToCamel(refName)
 			}
 			return "interface{}"
 		},

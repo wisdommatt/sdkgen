@@ -9,7 +9,7 @@ package client
 {{ if eq $definition.Type "object" }}
 
 type {{ toCamelCase $name }} struct {
-    {{ range $propName, $prop := $definition.Properties }} {{ toCamelCase $propName }} {{ extractTypeName $prop.Type $prop.Ref }} `json:"{{ $propName }}"` 
+    {{ range $propName, $prop := $definition.Properties }} {{ toCamelCase $propName }} {{ extractTypeName $schema $name $prop.Type $prop.Ref }} `json:"{{ $propName }}"` 
     {{ end }}
 }
 
@@ -21,7 +21,7 @@ type {{ toCamelCase $name }} struct {
 {{ if eq $response.Schema.Type "object" }}
 
 type {{ toCamelCase $name }} struct {
-    {{ range $propName, $prop := $response.Schema.Properties}} {{ toCamelCase $propName }} {{ extractTypeName $prop.Type $prop.Ref }} `json:"{{ $propName }}"` 
+    {{ range $propName, $prop := $response.Schema.Properties}} {{ toCamelCase $propName }} {{ extractTypeName $schema $name $prop.Type $prop.Ref }} `json:"{{ $propName }}"` 
     {{ end }}
 }
 
