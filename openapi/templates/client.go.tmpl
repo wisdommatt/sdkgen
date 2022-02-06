@@ -15,3 +15,15 @@ type {{ toCamelCase $name }} struct {
 
 {{ end }}
 {{ end }}
+
+{{ range $name, $response := $schema.Responses }}
+
+{{ if eq $response.Schema.Type "object" }}
+
+type {{ toCamelCase $name }} struct {
+    {{ range $propName, $prop := $response.Schema.Properties}} {{ toCamelCase $propName }} {{ extractTypeName $prop.Type $prop.Ref }} `json:"{{ $propName }}"` 
+    {{ end }}
+}
+
+{{ end }}
+{{ end }}

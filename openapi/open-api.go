@@ -70,10 +70,7 @@ type ResponseSchemaProperty struct {
 	Example     string `json:"example" yaml:"example"`
 	Type        string `json:"type" yaml:"type"`
 	XGoName     string `json:"x-go-name" yaml:"x-go-name"`
-}
-
-type SecurityDefinition struct {
-	Type string `json:"type" yaml:"type"`
+	Ref         string `json:"$ref" yaml:"$ref"`
 }
 
 type OpenAPISchema struct {
@@ -88,6 +85,10 @@ type OpenAPISchema struct {
 	Schemes             []string                      `json:"schemes" yaml:"schemes"`
 	SecurityDefinitions map[string]SecurityDefinition `json:"securityDefinitions" yaml:"securityDefinitions"`
 	Swagger             string                        `json:"swagger" yaml:"swagger"`
+}
+
+type SecurityDefinition struct {
+	Type string `json:"type" yaml:"type"`
 }
 
 var (
