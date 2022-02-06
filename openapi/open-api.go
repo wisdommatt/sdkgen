@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/iancoleman/strcase"
+	"golang.org/x/tools/imports"
 	"gopkg.in/yaml.v2"
 )
 
@@ -144,5 +145,9 @@ func GenerateGoSDK(schemaFile string, outDir string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(outFile, buffer.Bytes(), 0700)
+	processedContents, err := imports.Process(outFile, buffer.Bytes(), nil)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(outFile, processedContents, 0700)
 }
