@@ -9,7 +9,6 @@ import (
 {{ $schema := . }}
 
 {{ range $name, $definition := $schema.Definitions }}
-{{/* TODO(wisdommatt): generate code for non-object types */}}
 {{ if eq $definition.Type "object" }}
 
 type {{ toCamelCase $name }} struct {
@@ -35,3 +34,4 @@ type {{ toCamelCase $name }} struct {
 
 {{ end }}
 {{ end }}
+

@@ -65,16 +65,8 @@ type RefSchema struct {
 }
 
 type Response struct {
-	Description string         `json:"description" yaml:"description"`
-	Schema      ResponseSchema `json:"schema" yaml:"schema"`
-}
-
-type ResponseSchema struct {
-	Properties map[string]Property `json:"properties" yaml:"properties"`
-	Required   []string            `json:"required" yaml:"required"`
-	Type       string              `json:"type" yaml:"type"`
-	Ref        string              `json:"$ref" yaml:"$ref"`
-	Format     string              `json:"format" yaml:"format"`
+	Description string     `json:"description" yaml:"description"`
+	Schema      Definition `json:"schema" yaml:"schema"`
 }
 
 type OpenAPISchema struct {
