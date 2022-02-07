@@ -36,6 +36,23 @@ type {{ toCamelCase $name }} struct {
 
 {{ range $apiName, $_ := $schema.ApiPathsMap }}
 type {{ toCamelCase $apiName }}API struct {
-
+    client *APIClient
 }
 {{ end }}
+
+type APIClient struct {
+    {{ range $apiName, $_ := $schema.ApiPathsMap }} {{ toCamelCase $apiName }} *{{ toCamelCase $apiName }}API
+    {{ end }}
+}
+
+// NewAPIClient creates a new API client.
+func NewAPIClient() *APIClient {
+    client := &APIClient{
+        {{ range $apiName, $_ := $schema.ApiPathsMap }} {{ toCamelCase $apiName }}: &{{ toCamelCase $apiName }}API{},
+        {{ end }}
+    }
+
+    {{ range $apiName, $_ := $schema.ApiPathsMap }} client.{{ toCamelCase $apiName }}.client = client
+    {{ end }}
+    return client
+}
