@@ -4,6 +4,12 @@ package client
 
 import (
     "time"
+    "net/http"
+    "io"
+    "encoding/json"
+    "bytes"
+    "context"
+    "fmt"
 )
 
 {{ $schema := . }}
@@ -54,6 +60,9 @@ type APIClient struct {
 
 // NewAPIClient creates a new API client.
 func NewAPIClient(cfg ClientConfiguration) *APIClient {
+    if len(cfg.DefaultHTTPHeaders) == 0 {
+        cfg.DefaultHTTPHeaders = make(map[string]string)
+    }
     client := &APIClient{
         cfg: cfg,
         {{ range $apiName, $_ := $schema.ApiPathsMap }} {{ toCamelCase $apiName }}: &{{ toCamelCase $apiName }}API{},
@@ -63,4 +72,35 @@ func NewAPIClient(cfg ClientConfiguration) *APIClient {
     {{ range $apiName, $_ := $schema.ApiPathsMap }} client.{{ toCamelCase $apiName }}.client = client
     {{ end }}
     return client
+}
+
+func (c *APIClient) makeHttpRequest(ctx context.Context, method, path string, requestBody, decodeTo interface{}) (*http.Response, error) {
+	var body io.Reader = nil
+    if requestBody != nil {
+        requestBodyJSON, err := json.Marshal(requestBody)
+        if err != nil {
+            return nil, err
+        }
+        body = bytes.NewBuffer(requestBodyJSON)
+    }
+	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", c.cfg.BaseURL, path), body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+    for key, value := range c.cfg.DefaultHTTPHeaders {
+        req.Header.Set(key, value)
+    }
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	err = json.NewDecoder(resp.Body).Decode(decodeTo)
+	if err != nil {
+		return nil, err
+	}
+	return resp, err
 }
