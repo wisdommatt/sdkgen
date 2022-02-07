@@ -40,12 +40,6 @@ type {{ toCamelCase $name }} struct {
 {{ end }}
 {{ end }}
 
-{{ range $apiName, $_ := $schema.ApiPathsMap }}
-type {{ toCamelCase $apiName }}API struct {
-    client *APIClient
-}
-{{ end }}
-
 
 type ClientConfiguration struct {
     BaseURL string
@@ -104,3 +98,26 @@ func (c *APIClient) makeHttpRequest(ctx context.Context, method, path string, re
 	}
 	return resp, err
 }
+
+
+{{ range $apiName, $apiInfo := $schema.ApiPathsMap }}
+
+type {{ toCamelCase $apiName }}API struct {
+    client *APIClient
+}
+
+{{ range $path, $pathInfoMap := $apiInfo }}
+{{ range $httpMethod, $pathInfo := $pathInfoMap }}
+
+{{ $input := print ",input " (extractTypeName $schema "" (pathParameterToProperty $pathInfo.Parameters)) }}
+{{ if eq $input ",input " }}
+{{ $input = "" }}
+{{ end }}
+
+func (s *{{ toCamelCase $apiName }}API) {{ toCamelCase $pathInfo.OperationID }}(ctx context.Context {{ $input }}) error {
+    panic("unimplemented")
+}
+
+{{ end }}
+{{ end }}
+{{ end }}

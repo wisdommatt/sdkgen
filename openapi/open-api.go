@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"strings"
 
 	"github.com/iancoleman/strcase"
 	"golang.org/x/tools/imports"
@@ -158,6 +159,18 @@ var (
 				Ref:         definition.Ref,
 				Format:      definition.Format,
 				XGoName:     definition.XGoName,
+			}
+		},
+		"toUpperCase": func(str string) string {
+			return strings.ToUpper(str)
+		},
+		"pathParameterToProperty": func(params []PathParameter) Property {
+			param := PathParameter{}
+			if len(params) > 0 {
+				param = params[0]
+			}
+			return Property{
+				Ref: param.Schema.Ref,
 			}
 		},
 	}
