@@ -36,6 +36,9 @@ type Definition struct {
 	Required    []string            `json:"required" yaml:"required"`
 	Type        string              `json:"type" yaml:"type"`
 	XGoPackage  string              `json:"x-go-package" yaml:"x-go-package"`
+	Ref         string              `json:"$ref" yaml:"$ref"`
+	Format      string              `json:"format" yaml:"format"`
+	XGoName     string              `json:"x-go-name" yaml:"x-go-name"`
 }
 
 type Info struct {
@@ -141,6 +144,15 @@ var (
 				return "[]" + res
 			}
 			return "interface{}"
+		},
+		"definitionToProperty": func(definition Definition) Property {
+			return Property{
+				Description: definition.Description,
+				Type:        definition.Type,
+				Ref:         definition.Ref,
+				Format:      definition.Format,
+				XGoName:     definition.XGoName,
+			}
 		},
 	}
 )

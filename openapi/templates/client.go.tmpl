@@ -19,7 +19,7 @@ type {{ toCamelCase $name }} struct {
 
 {{ else }}
 
-{{/* type {{ toCamelCase $name }} {{ extractTypeName $schema $name $definition }} */}}
+type {{ toCamelCase $name }} {{ extractTypeName $schema $name (definitionToProperty $definition) }}
 
 {{ end }}
 {{ end }}
