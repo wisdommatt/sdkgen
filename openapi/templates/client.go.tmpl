@@ -24,7 +24,6 @@ type {{ toCamelCase $name }} {{ extractTypeName $schema $name (definitionToPrope
 {{ end }}
 
 {{ range $name, $response := $schema.Responses }}
-
 {{ if eq $response.Schema.Type "object" }}
 
 type {{ toCamelCase $name }} struct {
@@ -35,3 +34,8 @@ type {{ toCamelCase $name }} struct {
 {{ end }}
 {{ end }}
 
+{{ range $apiName, $_ := $schema.ApiPathsMap }}
+type {{ toCamelCase $apiName }}API struct {
+
+}
+{{ end }}
