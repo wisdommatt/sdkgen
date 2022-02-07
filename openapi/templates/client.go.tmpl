@@ -40,14 +40,22 @@ type {{ toCamelCase $apiName }}API struct {
 }
 {{ end }}
 
+
+type ClientConfiguration struct {
+    BaseURL string
+	DefaultHTTPHeaders map[string]string
+}
+
 type APIClient struct {
+    cfg ClientConfiguration
     {{ range $apiName, $_ := $schema.ApiPathsMap }} {{ toCamelCase $apiName }} *{{ toCamelCase $apiName }}API
     {{ end }}
 }
 
 // NewAPIClient creates a new API client.
-func NewAPIClient() *APIClient {
+func NewAPIClient(cfg ClientConfiguration) *APIClient {
     client := &APIClient{
+        cfg: cfg,
         {{ range $apiName, $_ := $schema.ApiPathsMap }} {{ toCamelCase $apiName }}: &{{ toCamelCase $apiName }}API{},
         {{ end }}
     }
