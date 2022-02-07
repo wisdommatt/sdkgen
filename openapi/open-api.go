@@ -18,13 +18,8 @@ type Property struct {
 	XGoName              string      `json:"x-go-name" yaml:"x-go-name"`
 	Ref                  string      `json:"$ref" yaml:"$ref"`
 	Format               string      `json:"format" yaml:"format"`
-	AdditionalProperties struct {
-		AdditionalProperties struct {
-			Type string `json:"type"`
-			Ref  string `json:"$ref" yaml:"$ref"`
-		} `json:"additionalProperties" yaml:"additionalProperties"`
-	} `json:"additionalProperties" yaml:"additionalProperties"`
-	Items struct {
+	AdditionalProperties *Property   `json:"additionalProperties" yaml:"additionalProperties"`
+	Items                struct {
 		Type string `json:"type" yaml:"type"`
 		Ref  string `json:"$ref" yaml:"$ref"`
 	} `json:"items" yaml:"items"`
@@ -100,6 +95,50 @@ type SecurityDefinition struct {
 	Type string `json:"type" yaml:"type"`
 }
 
+// extractTypeName is a helper function for extracting property type name
+// as Go type or custom type name.
+func extractTypeName(schema *OpenAPISchema, parentName string, property Property) string {
+	res := property.Type
+	if property.Format != "" {
+		res = property.Format
+	}
+	if typeName, ok := builtInTypesMap[res]; ok {
+		res = typeName
+	}
+	if refName, ok := schema.RefMap[property.Ref]; ok {
+		// return non-required types as pointers
+		if refName == parentName {
+			res = "*" + strcase.ToCamel(refName)
+		} else {
+			res = strcase.ToCamel(refName)
+		}
+	}
+	if property.Type != "array" && res != "object" {
+		return res
+	}
+	if property.Items.Type != "" {
+		res = property.Items.Type
+	}
+	if refName, ok := schema.RefMap[property.Items.Ref]; ok {
+		res = strcase.ToCamel(refName)
+	}
+	if res != "object" {
+		return "[]" + res
+	}
+	// if property has additional properties then it is a map.
+	additionalProperties := property.AdditionalProperties
+	mapPrefix := ""
+	for additionalProperties != nil {
+		mapPrefix += "map[string]"
+		res = extractTypeName(schema, parentName, *additionalProperties)
+		additionalProperties = additionalProperties.AdditionalProperties
+	}
+	if mapPrefix != "" {
+		return mapPrefix + res
+	}
+	return "interface{}"
+}
+
 var (
 	builtInTypesMap = map[string]string{
 		"string":    "string",
@@ -116,34 +155,7 @@ var (
 			return strcase.ToCamel(str)
 		},
 		"extractTypeName": func(schema *OpenAPISchema, parentName string, property Property) string {
-			res := property.Type
-			if property.Format != "" {
-				res = property.Format
-			}
-			if typeName, ok := builtInTypesMap[res]; ok {
-				res = typeName
-			}
-			if refName, ok := schema.RefMap[property.Ref]; ok {
-				// return non-required types as pointers
-				if refName == parentName {
-					res = "*" + strcase.ToCamel(refName)
-				} else {
-					res = strcase.ToCamel(refName)
-				}
-			}
-			if property.Type != "array" && res != "object" {
-				return res
-			}
-			if property.Items.Type != "" {
-				res = property.Items.Type
-			}
-			if refName, ok := schema.RefMap[property.Items.Ref]; ok {
-				res = strcase.ToCamel(refName)
-			}
-			if res != "object" {
-				return "[]" + res
-			}
-			return "interface{}"
+			return extractTypeName(schema, parentName, property)
 		},
 		"definitionToProperty": func(definition Definition) Property {
 			return Property{
