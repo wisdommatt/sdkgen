@@ -43,13 +43,14 @@ type Info struct {
 }
 
 type Path struct {
-	Description string              `json:"description" yaml:"description"`
-	OperationID string              `json:"operationId" yaml:"operationId"`
-	Parameters  []PathParameter     `json:"parameters" yaml:"parameters"`
-	Responses   map[int]RefSchema   `json:"responses" yaml:"responses"`
-	Summary     string              `json:"summary" yaml:"summary"`
-	Tags        []string            `json:"tags" yaml:"tags"`
-	Security    map[string][]string `json:"security" yaml:"security"`
+	Description string                `json:"description" yaml:"description"`
+	OperationID string                `json:"operationId" yaml:"operationId"`
+	Parameters  []PathParameter       `json:"parameters" yaml:"parameters"`
+	Responses   map[string]RefSchema  `json:"responses" yaml:"responses"`
+	Summary     string                `json:"summary" yaml:"summary"`
+	Tags        []string              `json:"tags" yaml:"tags"`
+	Security    []map[string][]string `json:"security" yaml:"security"`
+	Schemes     []string              `json:"schemes" yaml:"schemes"`
 }
 
 type PathParameter struct {
@@ -82,13 +83,14 @@ type OpenAPISchema struct {
 	Definitions         map[string]Definition         `json:"definitions" yaml:"definitions"`
 	Host                string                        `json:"host" yaml:"host"`
 	Info                Info                          `json:"info" yaml:"info"`
-	Paths               map[string]Path               `json:"paths" yaml:"paths"`
+	Paths               map[string]map[string]Path    `json:"paths" yaml:"paths"`
 	Produces            []string                      `json:"produces" yaml:"produces"`
 	Responses           map[string]Response           `json:"responses" yaml:"responses"`
 	Schemes             []string                      `json:"schemes" yaml:"schemes"`
 	SecurityDefinitions map[string]SecurityDefinition `json:"securityDefinitions" yaml:"securityDefinitions"`
 	Swagger             string                        `json:"swagger" yaml:"swagger"`
 	RefMap              map[string]string
+	ApiPathsMap         map[string]map[string]map[string]Path
 }
 
 type SecurityDefinition struct {
@@ -176,7 +178,8 @@ func LoadOpenApiSchema(filePath string) (*OpenAPISchema, error) {
 		return nil, err
 	}
 	schema := OpenAPISchema{
-		RefMap: make(map[string]string),
+		RefMap:      make(map[string]string),
+		ApiPathsMap: make(map[string]map[string]map[string]Path),
 	}
 	err = yaml.Unmarshal(fileContents, &schema)
 	if err != nil {
@@ -189,6 +192,20 @@ func LoadOpenApiSchema(filePath string) (*OpenAPISchema, error) {
 	for name := range schema.Responses {
 		key := fmt.Sprintf("#/responses/%s", name)
 		schema.RefMap[key] = name
+	}
+	// extracting API paths based on path tags.
+	for path := range schema.Paths {
+		for httpMethod, pathInfo := range schema.Paths[path] {
+			for _, tag := range pathInfo.Tags {
+				if _, ok := schema.ApiPathsMap[tag]; !ok {
+					schema.ApiPathsMap[tag] = make(map[string]map[string]Path)
+				}
+				if _, ok := schema.ApiPathsMap[tag][path]; !ok {
+					schema.ApiPathsMap[tag][path] = make(map[string]Path)
+				}
+				schema.ApiPathsMap[tag][path][httpMethod] = pathInfo
+			}
+		}
 	}
 	return &schema, nil
 }
