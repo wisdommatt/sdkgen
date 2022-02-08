@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/iancoleman/strcase"
@@ -13,28 +14,24 @@ import (
 )
 
 type Property struct {
-	Description          string      `json:"description" yaml:"description"`
-	Type                 string      `json:"type" yaml:"type"`
-	Example              interface{} `json:"example" yaml:"example"`
-	XGoName              string      `json:"x-go-name" yaml:"x-go-name"`
-	Ref                  string      `json:"$ref" yaml:"$ref"`
-	Format               string      `json:"format" yaml:"format"`
-	AdditionalProperties *Property   `json:"additionalProperties" yaml:"additionalProperties"`
-	Items                struct {
-		Type string `json:"type" yaml:"type"`
-		Ref  string `json:"$ref" yaml:"$ref"`
-	} `json:"items" yaml:"items"`
-}
-
-type Definition struct {
-	Description string              `json:"description" yaml:"description"`
-	Properties  map[string]Property `json:"properties" yaml:"properties"`
-	Required    []string            `json:"required" yaml:"required"`
-	Type        string              `json:"type" yaml:"type"`
-	XGoPackage  string              `json:"x-go-package" yaml:"x-go-package"`
-	Ref         string              `json:"$ref" yaml:"$ref"`
-	Format      string              `json:"format" yaml:"format"`
-	XGoName     string              `json:"x-go-name" yaml:"x-go-name"`
+	Description          string              `json:"description" yaml:"description"`
+	Properties           map[string]Property `json:"properties" yaml:"properties"`
+	Required             []string            `json:"required" yaml:"required"`
+	Type                 string              `json:"type" yaml:"type"`
+	XGoPackage           string              `json:"x-go-package" yaml:"x-go-package"`
+	Ref                  string              `json:"$ref" yaml:"$ref"`
+	Format               string              `json:"format" yaml:"format"`
+	XGoName              string              `json:"x-go-name" yaml:"x-go-name"`
+	AdditionalProperties *Property           `json:"additionalProperties" yaml:"additionalProperties"`
+	Items                *Property           `json:"items" yaml:"items"`
+	XML                  struct {
+		Name    string `json:"name"`
+		Wrapped bool   `json:"wrapped"`
+	} `json:"xml"`
+	Default struct {
+		Description string `json:"description"`
+	} `json:"default"`
+	Schema *Property `json:"schema" yaml:"schema"`
 }
 
 type Info struct {
@@ -47,38 +44,36 @@ type Path struct {
 	Description string                `json:"description" yaml:"description"`
 	OperationID string                `json:"operationId" yaml:"operationId"`
 	Parameters  []PathParameter       `json:"parameters" yaml:"parameters"`
-	Responses   map[string]RefSchema  `json:"responses" yaml:"responses"`
+	Responses   map[string]Property   `json:"responses" yaml:"responses"`
 	Summary     string                `json:"summary" yaml:"summary"`
 	Tags        []string              `json:"tags" yaml:"tags"`
 	Security    []map[string][]string `json:"security" yaml:"security"`
 	Schemes     []string              `json:"schemes" yaml:"schemes"`
+	Consumes    []string              `json:"consumes" yaml:"consumes"`
+	Produces    []string              `json:"produces"`
 }
 
 type PathParameter struct {
-	In       string    `json:"in" yaml:"in"`
-	Name     string    `json:"name" yaml:"name"`
-	Required bool      `json:"required" yaml:"required"`
-	Schema   RefSchema `json:"schema" yaml:"schema"`
+	Description string   `json:"description" yaml:"description"`
+	In          string   `json:"in" yaml:"in"`
+	Name        string   `json:"name" yaml:"name"`
+	Required    bool     `json:"required" yaml:"required"`
+	Schema      Property `json:"schema" yaml:"schema"`
 }
-
-type RefSchema struct {
-	Ref string `json:"$ref" yaml:"$ref"`
-}
-
 type Response struct {
-	Description string     `json:"description" yaml:"description"`
-	Schema      Definition `json:"schema" yaml:"schema"`
+	Description string   `json:"description" yaml:"description"`
+	Schema      Property `json:"schema" yaml:"schema"`
 }
 
 type OpenAPISchema struct {
 	BasePath            string                        `json:"basePath" yaml:"basePath"`
 	Consumes            []string                      `json:"consumes" yaml:"consumes"`
-	Definitions         map[string]Definition         `json:"definitions" yaml:"definitions"`
+	Definitions         map[string]Property           `json:"definitions" yaml:"definitions"`
 	Host                string                        `json:"host" yaml:"host"`
 	Info                Info                          `json:"info" yaml:"info"`
 	Paths               map[string]map[string]Path    `json:"paths" yaml:"paths"`
 	Produces            []string                      `json:"produces" yaml:"produces"`
-	Responses           map[string]Response           `json:"responses" yaml:"responses"`
+	Responses           map[string]Property           `json:"responses" yaml:"responses"`
 	Schemes             []string                      `json:"schemes" yaml:"schemes"`
 	SecurityDefinitions map[string]SecurityDefinition `json:"securityDefinitions" yaml:"securityDefinitions"`
 	Swagger             string                        `json:"swagger" yaml:"swagger"`
@@ -87,7 +82,15 @@ type OpenAPISchema struct {
 }
 
 type SecurityDefinition struct {
-	Type string `json:"type" yaml:"type"`
+	Type             string `json:"type"`
+	Name             string `json:"name"`
+	In               string `json:"in"`
+	AuthorizationURL string `json:"authorizationUrl"`
+	Flow             string `json:"flow"`
+	Scopes           struct {
+		ReadPets  string `json:"read:pets"`
+		WritePets string `json:"write:pets"`
+	} `json:"scopes"`
 }
 
 // extractTypeName is a helper function for extracting property type name
@@ -111,11 +114,13 @@ func extractTypeName(schema *OpenAPISchema, parentName string, property Property
 	if property.Type != "array" && res != "object" {
 		return res
 	}
-	if property.Items.Type != "" {
-		res = property.Items.Type
-	}
-	if refName, ok := schema.RefMap[property.Items.Ref]; ok {
-		res = strcase.ToCamel(refName)
+	if property.Items != nil {
+		if property.Items.Type != "" {
+			res = property.Items.Type
+		}
+		if refName, ok := schema.RefMap[property.Items.Ref]; ok {
+			res = strcase.ToCamel(refName)
+		}
 	}
 	if res != "object" {
 		return "[]" + res
@@ -143,6 +148,15 @@ var (
 		"date-time": "time.Time",
 		"double":    "float64",
 		"int64":     "int",
+		"int32":     "int",
+	}
+
+	builtInGoTypesMap = map[string]string{
+		"string":    "string",
+		"bool":      " boolean",
+		"int":       "integer",
+		"float64":   "double",
+		"time.Time": "date-time",
 	}
 
 	templateFuncs template.FuncMap = template.FuncMap{
@@ -152,15 +166,15 @@ var (
 		"extractTypeName": func(schema *OpenAPISchema, parentName string, property Property) string {
 			return extractTypeName(schema, parentName, property)
 		},
-		"definitionToProperty": func(definition Definition) Property {
-			return Property{
-				Description: definition.Description,
-				Type:        definition.Type,
-				Ref:         definition.Ref,
-				Format:      definition.Format,
-				XGoName:     definition.XGoName,
-			}
-		},
+		// "definitionToProperty": func(definition Definition) Property {
+		// 	return Property{
+		// 		Description: definition.Description,
+		// 		Type:        definition.Type,
+		// 		Ref:         definition.Ref,
+		// 		Format:      definition.Format,
+		// 		XGoName:     definition.XGoName,
+		// 	}
+		// },
 		"toUpperCase": func(str string) string {
 			return strings.ToUpper(str)
 		},
@@ -172,6 +186,20 @@ var (
 			return Property{
 				Ref: param.Schema.Ref,
 			}
+		},
+		"stringToInt": func(str string) int {
+			i, _ := strconv.Atoi(str)
+			return i
+		},
+		"extractResponseTypeFields": func(schema *OpenAPISchema, parentName string, responses map[string]Response) string {
+			fields := ""
+			// fieldsMap := ""
+			// for _, response := range responses {
+			// 	// statusCode, _ := strconv.Atoi(statusCodeStr)
+			// 	// schemaType := extractTypeName(schema, parentName, response.Schema)
+
+			// }
+			return fields
 		},
 	}
 )

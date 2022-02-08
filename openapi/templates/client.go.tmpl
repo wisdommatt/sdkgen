@@ -24,7 +24,7 @@ type {{ toCamelCase $name }} struct {
 
 {{ else }}
 
-type {{ toCamelCase $name }} {{ extractTypeName $schema $name (definitionToProperty $definition) }}
+type {{ toCamelCase $name }} {{ extractTypeName $schema $name $definition }}
 
 {{ end }}
 {{ end }}
@@ -114,7 +114,29 @@ type {{ toCamelCase $apiName }}API struct {
 {{ $input = "" }}
 {{ end }}
 
-func (s *{{ toCamelCase $apiName }}API) {{ toCamelCase $pathInfo.OperationID }}(ctx context.Context {{ $input }}) error {
+{{ $methodName := toCamelCase $pathInfo.OperationID }}
+{{ $responseType := print $methodName "Response"}}
+
+type {{ $responseType }} struct {
+    {{ range $statusCode, $definition := $pathInfo.Responses }}
+
+    {{ end }}
+}
+
+func (s *{{ toCamelCase $apiName }}API) {{ $methodName }}(ctx context.Context {{ $input }}) (*{{ $responseType }}, error) {
+    var response {{ $responseType }}
+    {{ if ne $input "" }} requestBody := input {{ else }} var requestBody interface{} {{ end }}
+    httpResponse, err := s.client.makeHttpRequest(ctx, "{{ toUpperCase $httpMethod }}", "{{ $path }}", requestBody, &response)
+	if err != nil {
+		return nil, err
+	}
+	if httpResponse.StatusCode == 300 {
+        return nil, fmt.Errorf("")
+		// return nil, &SendSmsBadRequestError{Response: response}
+	}
+	if httpResponse.StatusCode == http.StatusForbidden {
+		// return nil, &SendSmsForbiddenError{Response: response}
+	}
     panic("unimplemented")
 }
 
