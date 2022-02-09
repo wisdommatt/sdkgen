@@ -1,0 +1,2317 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  APIResponse:
+    description: APIResponse entity
+    properties:
+      body:
+        description: Api response body to hold extra details
+        type: object
+        x-go-name: Body
+      message:
+        description: Api response message to display to clients
+        example: account created successfully
+        type: string
+        x-go-name: Message
+      status:
+        description: |-
+          Status of the request;
+          it can either be success, error, warning
+        example: succes
+        type: string
+        x-go-name: Status
+    required:
+    - status
+    - message
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  BankAccount:
+    properties:
+      account_name:
+        type: string
+        x-go-name: AccountName
+      account_number:
+        type: string
+        x-go-name: AccountNumber
+      bank_code:
+        type: string
+        x-go-name: BankCode
+      bank_name:
+        type: string
+        x-go-name: BankName
+      currency_code:
+        type: string
+        x-go-name: CurrencyCode
+      customer_email:
+        type: string
+        x-go-name: CustomerEmail
+    title: BankAccount entity that holds datas required for a user bank account.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  Cart:
+    description: Cart entity
+    properties:
+      id:
+        type: string
+        x-go-name: ID
+      product:
+        $ref: '#/definitions/Product'
+      product_id:
+        type: object
+        x-go-name: ProductID
+      quantity:
+        format: int64
+        type: integer
+        x-go-name: Quantity
+      time_added:
+        format: date-time
+        type: string
+        x-go-name: TimeAdded
+      type:
+        type: string
+        x-go-name: Type
+      user_id:
+        type: object
+        x-go-name: UserID
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  Chat:
+    description: Chat entity
+    properties:
+      date_sent:
+        format: date-time
+        type: string
+        x-go-name: DateSent
+      id:
+        type: object
+        x-go-name: ID
+      message:
+        type: string
+        x-go-name: Message
+      timesale_id:
+        type: object
+        x-go-name: TimeSaleID
+      user_fullname:
+        type: string
+        x-go-name: UserFullName
+      user_id:
+        type: object
+        x-go-name: UserID
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  CryptoAccount:
+    properties:
+      account_email:
+        type: string
+        x-go-name: AccountEmail
+      account_name:
+        type: string
+        x-go-name: AccountName
+      balance:
+        format: double
+        type: number
+        x-go-name: Balance
+      date_created:
+        format: date-time
+        type: string
+        x-go-name: DateCreated
+    title: CryptoAccount is the entity that holds details of the user crypto coin.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  Duration:
+    description: |-
+      A Duration represents the elapsed time between two instants
+      as an int64 nanosecond count. The representation limits the
+      largest representable duration to approximately 290 years.
+    format: int64
+    type: integer
+    x-go-package: time
+  GetProfileResponse:
+    properties:
+      message:
+        description: api response message
+        example: Profile returned successfully
+        type: string
+        x-go-name: Message
+      profile:
+        $ref: '#/definitions/User'
+      status:
+        description: api response status
+        example: success
+        type: string
+        x-go-name: Status
+    title: GetProfileResponse this is the format a profile response is sent to the
+      client.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/user
+  GetReferralsResponse:
+    properties:
+      message:
+        example: Referrals returned successfully !
+        type: string
+        x-go-name: Message
+      referrals:
+        items:
+          $ref: '#/definitions/User'
+        type: array
+        x-go-name: Referrals
+      status:
+        example: success
+        type: string
+        x-go-name: Status
+    title: GetReferralsResponse is the response for get referrals.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/user
+  JWT:
+    description: JWT entity
+    properties:
+      token:
+        type: string
+        x-go-name: Token
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  JWTResponse:
+    description: JWTResponse entity
+    properties:
+      body:
+        $ref: '#/definitions/JWT'
+      message:
+        description: Api response message to display to clients
+        example: successful
+        type: string
+        x-go-name: Message
+      status:
+        description: |-
+          Status of the request;
+          it can either be success, error, warning
+        example: success
+        type: string
+        x-go-name: Status
+    required:
+    - status
+    - message
+    - body
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  Merchant:
+    properties:
+      bank_account_name:
+        type: string
+        x-go-name: BankAccountName
+      bank_account_number:
+        type: string
+        x-go-name: BankAccountNumber
+      bank_name:
+        type: string
+        x-go-name: BankName
+      business_categories:
+        items:
+          type: string
+        type: array
+        x-go-name: BusinessCategories
+      business_city:
+        type: string
+        x-go-name: BusinessCity
+      business_description:
+        type: string
+        x-go-name: BusinessDescription
+      business_email:
+        type: string
+        x-go-name: BusinessEmail
+      business_name:
+        type: string
+        x-go-name: BusinessName
+      business_phone:
+        type: string
+        x-go-name: BusinessPhone
+      business_state:
+        type: string
+        x-go-name: BusinessState
+      business_types:
+        items:
+          type: string
+        type: array
+        x-go-name: BusinessTypes
+      currency:
+        type: string
+        x-go-name: Currency
+      customers_count:
+        format: int64
+        type: integer
+        x-go-name: CustomersCount
+      date_registered:
+        format: date-time
+        type: string
+        x-go-name: DateRegistered
+      deliveries:
+        additionalProperties:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+        type: object
+        x-go-name: Deliveries
+      delivery_cities:
+        items:
+          type: string
+        type: array
+        x-go-name: DeliveryCities
+      delivery_country:
+        type: string
+        x-go-name: DeliveryCountry
+      delivery_state:
+        type: string
+        x-go-name: DeliveryState
+      google_sheet_id:
+        type: string
+        x-go-name: GoogleSheetID
+      google_sheet_url:
+        type: string
+        x-go-name: GoogleSheetURL
+      logo_url:
+        type: string
+        x-go-name: LogoURL
+      market_commission:
+        format: double
+        type: number
+        x-go-name: MarketCommission
+      monthly_sales_count:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+        x-go-name: MonthlySalesCount
+      monthly_sales_total:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+        x-go-name: MonthlySalesTotal
+      orders_count:
+        format: int64
+        type: integer
+        x-go-name: OrdersCount
+      sales_count:
+        format: int64
+        type: integer
+        x-go-name: SalesCount
+      shop_address:
+        type: string
+        x-go-name: ShopAddress
+      store_commission:
+        format: double
+        type: number
+        x-go-name: StoreCommission
+      total_sales:
+        format: int64
+        type: integer
+        x-go-name: TotalSales
+    title: Merchant entity holds merchant informations.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  Order:
+    description: Order entity
+    properties:
+      base64_details:
+        type: string
+        x-go-name: Base64Details
+      id:
+        type: string
+        x-go-name: ID
+      items_cost:
+        format: double
+        type: number
+        x-go-name: ItemsCost
+      merchant_shipping_details:
+        additionalProperties:
+          $ref: '#/definitions/ShippingFeeDetails'
+        type: object
+        x-go-name: MerchantShippingDetails
+      order_id:
+        type: string
+        x-go-name: OrderID
+      products:
+        items:
+          $ref: '#/definitions/OrderItem'
+        type: array
+        x-go-name: Items
+      shipping_cost:
+        format: double
+        type: number
+        x-go-name: ShippingCost
+      shipping_details:
+        $ref: '#/definitions/ShippingDetails'
+      status:
+        type: string
+        x-go-name: Status
+      time_added:
+        format: date-time
+        type: string
+        x-go-name: TimeAdded
+      time_delivered:
+        format: date-time
+        type: string
+        x-go-name: TimeDelivered
+      total_cost:
+        format: double
+        type: number
+        x-go-name: TotalCost
+      type:
+        type: string
+        x-go-name: Type
+      user_id:
+        type: object
+        x-go-name: UserID
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  OrderItem:
+    description: |-
+      OrderItem order item for order endpoint request
+      body.
+    properties:
+      item_id:
+        description: |-
+          For Emporium this should be the Product ID.
+          For Time Market this should be the TimeSale ID.
+          For Special Offer this should be the Special Offer ID.
+        example: 5fb600613c36b29a37b2f1bc
+        type: string
+        x-go-name: ItemID
+      quantity:
+        example: 10
+        format: int64
+        type: integer
+        x-go-name: Quantity
+      type:
+        description: Available types {Emporium, Time Market, Special Offer}.
+        example: Special Offer
+        type: string
+        x-go-name: Type
+    required:
+    - item_id
+    - type
+    - quantity
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity/api/v1
+  OrderRequestBody:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/OrderItem'
+        type: array
+        x-go-name: Items
+      shipping_details:
+        $ref: '#/definitions/ShippingDetails'
+    required:
+    - items
+    - shipping_details
+    title: OrderRequestBody request body for order endpoint.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity/api/v1
+  Product:
+    description: Product entity
+    properties:
+      age_group:
+        type: string
+        x-go-name: AgeGroup
+      brand:
+        type: string
+        x-go-name: Brand
+      bulk_discounts:
+        additionalProperties:
+          format: double
+          type: number
+        type: object
+        x-go-name: BulkDiscounts
+      categories:
+        description: categories of the product
+        example: '[]{"Fashion", "Clothing", "Electronics"}'
+        items:
+          type: string
+        minLength: 1
+        type: array
+        x-go-name: Categories
+      colour:
+        type: string
+        x-go-name: Colour
+      compare_at_price:
+        format: double
+        type: number
+        x-go-name: CompareAtPrice
+      cost_per_item:
+        format: double
+        type: number
+        x-go-name: CostPerItem
+      date_added:
+        example: 2020/12/22
+        format: date-time
+        type: string
+        x-go-name: DateAdded
+      description:
+        description: product description
+        type: string
+        x-go-name: Description
+      discount:
+        format: double
+        type: number
+        x-go-name: Discount
+      free_delivery:
+        type: string
+        x-go-name: FreeDelivery
+      gender:
+        type: string
+        x-go-name: Gender
+      google_category:
+        type: string
+        x-go-name: GoogleCategory
+      id:
+        description: id of the product
+        example: UsiJauKa9mAhMsjAnsljMs
+        readOnly: true
+        type: string
+        x-go-name: ID
+      image:
+        example: https://domain.com/productImage.png
+        minLength: 10
+        type: string
+        x-go-name: Image
+      images:
+        items:
+          type: string
+        type: array
+        x-go-name: Images
+      merchant:
+        $ref: '#/definitions/Merchant'
+      merchant_address:
+        type: string
+        x-go-name: MerchantAddress
+      name:
+        example: Iphone 12
+        minLength: 1
+        type: string
+        x-go-name: Name
+      price:
+        description: product price in Naira
+        example: 10000
+        format: double
+        type: number
+        x-go-name: Price
+      product_count:
+        format: int64
+        type: integer
+        x-go-name: ProductCount
+      profit:
+        format: double
+        type: number
+        x-go-name: Profit
+      quantity:
+        format: int64
+        type: integer
+        x-go-name: Quantity
+      shop_price:
+        description: 'Depreciated: left just to keep the app OK'
+        format: double
+        type: number
+        x-go-name: ShopPrice
+      size_specifications:
+        additionalProperties:
+          additionalProperties:
+            format: double
+            type: number
+          type: object
+        type: object
+        x-go-name: SizeSpecifications
+      sizes:
+        items:
+          type: string
+        type: array
+        x-go-name: Sizes
+      type:
+        description: Product type e.g {Emporium, Special Offer}
+        type: string
+        x-go-name: Type
+      url:
+        type: string
+        x-go-name: URL
+      weight:
+        description: weight of the product in kilogram
+        example: 3.5
+        format: double
+        minimum: 0.3
+        type: number
+        x-go-name: Weight
+    required:
+    - name
+    - image
+    - categories
+    - price
+    - weight
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  ShippingDetails:
+    properties:
+      MerchantShippingDetails:
+        additionalProperties:
+          additionalProperties:
+            type: object
+          type: object
+        type: object
+      address1:
+        type: string
+        x-go-name: Address1
+      address2:
+        type: string
+        x-go-name: Address2
+      city:
+        type: string
+        x-go-name: City
+      country:
+        type: string
+        x-go-name: Country
+      fullname:
+        type: string
+        x-go-name: FullName
+      phone_number1:
+        type: string
+        x-go-name: PhoneNumber1
+      phone_number2:
+        type: string
+        x-go-name: PhoneNumber2
+      state:
+        type: string
+        x-go-name: State
+    required:
+    - fullname
+    - phone_number1
+    - country
+    - state
+    - city
+    - address1
+    title: ShippingDetails entity.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  ShippingFeeDetails:
+    properties:
+      doorstep_logistics_company:
+        type: string
+        x-go-name: DoorStepLogisticsCompany
+      doorstep_price:
+        format: double
+        type: number
+        x-go-name: DoorStepPrice
+      terminal_logistics_company:
+        type: string
+        x-go-name: TerminalLogisticsCompany
+      terminal_price:
+        format: double
+        type: number
+        x-go-name: TerminalPrice
+    title: ShippingFeeDetails object that holds shipping fee details and prices.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  TimeSale:
+    description: TimeSale entity
+    properties:
+      categories:
+        description: categories of the product
+        example: '[]{"Fashion", "Clothing", "Electronics"}'
+        items:
+          type: string
+        minLength: 1
+        type: array
+        x-go-name: Categories
+      countdown:
+        $ref: '#/definitions/Duration'
+      date_added:
+        example: 2020/12/22 20:30:23
+        format: date-time
+        type: string
+        x-go-name: DateAdded
+      date_ordered:
+        format: date-time
+        type: string
+        x-go-name: DateOrdered
+      end_time:
+        description: the time the timesale will be won
+        example: 2020/12/22 20:30:23
+        format: date-time
+        type: string
+        x-go-name: EndTime
+      id:
+        description: id of the timesale
+        example: isJdAIesdfeM
+        readOnly: true
+        type: string
+        x-go-name: ID
+      locations:
+        description: location where the product should show
+        example: '[]{"Rivers State", "Lagos State", "Abia State"}'
+        items:
+          type: string
+        minLength: 1
+        type: array
+        x-go-name: Locations
+      order_id:
+        type: object
+        x-go-name: OrderID
+      order_status:
+        type: string
+        x-go-name: OrderStatus
+      price:
+        example: 12.49
+        format: double
+        minimum: 1
+        type: number
+        x-go-name: Price
+      product_id:
+        description: time sale product id
+        example: UsiJauKa9mAhMsjAnsljMs
+        type: object
+        x-go-name: ProductID
+      product_image:
+        description: product image
+        example: https://res-console.cloudinary.com/timiun1/thumbnails/v1/image/upload/v1602505281/YW5kcm9pZF9mY3pmYzg=/preview
+        type: string
+        x-go-name: ProductImage
+      product_name:
+        description: |-
+          timesale product name
+          example; Iphone 12
+        type: string
+        x-go-name: ProductName
+      shop_price:
+        description: shop price in Naira
+        example: 300000.89
+        format: double
+        minimum: 1
+        type: number
+        x-go-name: ShopPrice
+      start_time:
+        description: the time the time sale will begin
+        example: 2020/12/22 20:30:23
+        format: date-time
+        type: string
+        x-go-name: StartTime
+      status:
+        description: timesale status
+        example: available
+        type: string
+        x-go-name: Status
+      time_won:
+        format: date-time
+        type: string
+        x-go-name: TimeWon
+      views:
+        description: AddedBy        *User            `json:"added_by" bson:"added_by,omitempty"`
+        format: int64
+        type: integer
+        x-go-name: Views
+      winner:
+        type: object
+        x-go-name: Winner
+      winner_fullname:
+        type: string
+        x-go-name: WinnerFullName
+    required:
+    - product_id
+    - price
+    - shop_price
+    - categories
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  TransferCreditParameter:
+    properties:
+      amount:
+        example: 100.43
+        format: double
+        type: number
+        x-go-name: Amount
+      password:
+        example: aPassWorD
+        type: string
+        x-go-name: Password
+      receiver_wallet_address:
+        example: js8KaiKLajmss9022kmamskaKaiLsjJaksie
+        type: string
+        x-go-name: ReceiverWalletAddress
+    required:
+    - receiver_wallet_address
+    - amount
+    - password
+    title: TransferCreditParameter format for transfer credit requestBody.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/user
+  TransferCreditResponse:
+    properties:
+      message:
+        example: Credit transfer successfully !
+        type: string
+        x-go-name: Message
+      status:
+        example: success
+        type: string
+        x-go-name: Status
+      transferer_wallet_balance:
+        description: transferer wallet balance after transaction
+        example: 900.45
+        format: double
+        type: number
+        x-go-name: TransfererWalletBalance
+    title: TransferCreditResponse response for transfer credit success.
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/user
+  User:
+    description: User entity
+    properties:
+      address:
+        example: no 30 didi street, Rivers state
+        minLength: 10
+        type: string
+        x-go-name: Address
+      bank_account:
+        $ref: '#/definitions/BankAccount'
+      campus:
+        description: user campus if any
+        example: Rivers State University
+        type: string
+        x-go-name: Campus
+      date_added:
+        example: 2020/12/22
+        format: date-time
+        type: string
+        x-go-name: DateAdded
+      email:
+        example: test@user.com
+        minLength: 3
+        type: string
+        x-go-name: Email
+      fullname:
+        example: test user
+        type: string
+        x-go-name: FullName
+      gender:
+        description: gender of the user cannot be updated
+        example: female
+        type: string
+        x-go-name: Gender
+      id:
+        description: id of the user
+        example: hdxsjksjemdsedede
+        readOnly: true
+        type: string
+        x-go-name: ID
+      interests:
+        example:
+        - fashion
+        - gadgets
+        - electronics
+        items:
+          type: string
+        minLength: 1
+        type: array
+        x-go-name: Interests
+      is_activated:
+        type: boolean
+        x-go-name: IsActivated
+      location:
+        description: user location
+        example: Gra, port-harcourt rivers state
+        type: string
+        x-go-name: Location
+      merchant:
+        $ref: '#/definitions/Merchant'
+      password:
+        type: string
+        x-go-name: PurePassword
+      phone:
+        example: "040455994858"
+        type: string
+        x-go-name: Phone
+      ref_id:
+        type: string
+        x-go-name: RefID
+      referral_wallet:
+        $ref: '#/definitions/UserWallet'
+      referred_by:
+        description: referrer refId
+        example: refUser
+        type: string
+        x-go-name: ReferredBy
+      referrer:
+        $ref: '#/definitions/User'
+      role:
+        readOnly: true
+        type: string
+        x-go-name: Role
+      source:
+        description: |-
+          where the user registered from;
+          used for analytics ...
+          allowed sources : web, android, ios, pc
+          source cannot be updated later
+        example: mobile
+        type: string
+        x-go-name: Source
+      wallet:
+        $ref: '#/definitions/UserWallet'
+    required:
+    - fullname
+    - gender
+    - email
+    - phone
+    - address
+    - password
+    - source
+    - date_added
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  UserWallet:
+    description: UserWallet entity
+    properties:
+      address:
+        type: string
+        x-go-name: Address
+      crypto:
+        $ref: '#/definitions/CryptoAccount'
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/entity
+  activationData:
+    properties:
+      activation_code:
+        example: 1234
+        format: int64
+        type: integer
+        x-go-name: ActivationCode
+      activation_email:
+        example: hello@test.com
+        type: string
+        x-go-name: ActivationEmail
+      address:
+        description: user address
+        type: string
+        x-go-name: Address
+      campus:
+        description: student's campus
+        example: Rivers State University
+        type: string
+        x-go-name: Campus
+      gender:
+        example: male
+        type: string
+        x-go-name: Gender
+      interests:
+        example:
+        - Fashion
+        - Clothing
+        - Electronics
+        items:
+          type: string
+        type: array
+        x-go-name: Interests
+      location:
+        example: Eliozu, Port-harcourt, Rivers State, Nigeria
+        type: string
+        x-go-name: Location
+      referred_by:
+        description: referrer refId
+        example: helloWorld
+        type: string
+        x-go-name: ReferredBy
+    required:
+    - activation_email
+    - activation_code
+    - gender
+    - location
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/registration
+  addRequestBody:
+    properties:
+      product_id:
+        example: 522idn3ujdkedmed3ee2w2ws
+        type: string
+        x-go-name: ProductID
+      quantity:
+        example: 2
+        format: int64
+        type: integer
+        x-go-name: Quantity
+    required:
+    - product_id
+    - quantity
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/cart
+  cartItem:
+    properties:
+      product_id:
+        type: string
+        x-go-name: ProductID
+      quantity:
+        format: int64
+        type: integer
+        x-go-name: Quantity
+    required:
+    - product_id
+    - quantity
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/order
+  categoriesData:
+    properties:
+      categories:
+        description: categories array
+        example:
+        - Cosmetic
+        - Fashion
+        items:
+          type: string
+        type: array
+        x-go-name: Categories
+    required:
+    - categories
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/product
+  categoriesFilterData:
+    properties:
+      categories:
+        description: categories array
+        example:
+        - Fashion
+        - Electronics
+        - Men
+        items:
+          type: string
+        minLength: 1
+        type: array
+        x-go-name: Categories
+      status:
+        description: timesale status
+        example: available
+        type: string
+        x-go-name: Status
+    required:
+    - categories
+    - status
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/timesale
+  deleteRequestBody:
+    properties:
+      item_id:
+        example: 53snws832qsjasjasnqsanws2
+        type: string
+        x-go-name: ItemID
+    required:
+    - item_id
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/cart
+  ecommerceRequestBody:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/cartItem'
+        type: array
+        x-go-name: Items
+      shipping_details:
+        $ref: '#/definitions/ShippingDetails'
+    required:
+    - items
+    - shipping_details
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/order
+  forgotPasswordData:
+    properties:
+      email:
+        example: test@example.com
+        type: string
+        x-go-name: Email
+    required:
+    - email
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/auth
+  generalWebsocketMessage:
+    properties:
+      PreviousChats:
+        description: This is returned only in chat welcome
+        items:
+          $ref: '#/definitions/Chat'
+        type: array
+      countdown:
+        example: 15
+        format: int64
+        type: integer
+        x-go-name: CountDown
+      message:
+        description: required only for chat
+        example: hello bro
+        type: string
+        x-go-name: Message
+      status:
+        description: available status => {success, error, welcome}
+        example: success
+        type: string
+        x-go-name: Status
+      type:
+        description: accepted types => {chat, counter, counter-welcome, counter-ping}
+        example: counter
+        type: string
+        x-go-name: Type
+      user_fullname:
+        description: required only for chat
+        example: John Doe
+        type: string
+        x-go-name: UserFullName
+      user_id:
+        description: required only for chat
+        example: jsjsmkAKdlIA
+        type: object
+        x-go-name: UserID
+    required:
+    - type
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/timesale
+  getAvailableResponse:
+    properties:
+      message:
+        example: Products returned successfully
+        type: string
+        x-go-name: Message
+      products:
+        items:
+          $ref: '#/definitions/Product'
+        type: array
+        x-go-name: Products
+      status:
+        example: success
+        type: string
+        x-go-name: Status
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/specialoffer
+  getCartItemsResponse:
+    properties:
+      Items:
+        items:
+          $ref: '#/definitions/Cart'
+        type: array
+      message:
+        example: Items returned successfully !
+        type: string
+        x-go-name: Message
+      status:
+        example: success
+        type: string
+        x-go-name: Status
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/cart
+  loginData:
+    properties:
+      email:
+        example: test@user.com
+        type: string
+        x-go-name: Email
+      password:
+        example: myPassword
+        type: string
+        x-go-name: Password
+    required:
+    - email
+    - password
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/auth
+  productResponse:
+    properties:
+      message:
+        description: API response message
+        example: Product not found
+        type: string
+        x-go-name: Message
+      product:
+        $ref: '#/definitions/Product'
+      status:
+        description: API response status
+        example: success
+        type: string
+        x-go-name: Status
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/product
+  productsResponse:
+    properties:
+      message:
+        description: api response message
+        type: string
+        x-go-name: Message
+      products:
+        description: |-
+          Products returned.
+          It will be null if no products are returned.
+        items:
+          $ref: '#/definitions/Product'
+        type: array
+        x-go-name: Products
+      products_count:
+        description: |-
+          ProductsCount the total number of products to
+          be returned.
+          In a pagination it returns the total products that match a
+          filter instead of the products returned per page.
+        format: int64
+        type: integer
+        x-go-name: ProductsCount
+      status:
+        description: api response status
+        type: string
+        x-go-name: Status
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/product
+  registerData:
+    properties:
+      email:
+        type: string
+        x-go-name: Email
+      fullname:
+        type: string
+        x-go-name: FullName
+      password:
+        type: string
+        x-go-name: Password
+      phone:
+        description: user phone number
+        type: string
+        x-go-name: Phone
+      source:
+        description: |-
+          user ref source
+          supported sources are web, pc, android, ios
+        type: string
+        x-go-name: Source
+    required:
+    - fullname
+    - email
+    - phone
+    - password
+    - source
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/registration
+  resendActivationCodeData:
+    properties:
+      email:
+        example: hello@example.com
+        type: string
+        x-go-name: Email
+    required:
+    - email
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/registration
+  resetPasswordData:
+    properties:
+      email:
+        example: example@gmail.com
+        type: string
+        x-go-name: Email
+      new_password:
+        example: 1wsjsmasaAsps
+        type: string
+        x-go-name: NewPassword
+      secret_code:
+        example: "1245"
+        type: string
+        x-go-name: SecretCode
+    required:
+    - email
+    - new_password
+    - secret_code
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/auth
+  searchResponse:
+    properties:
+      message:
+        example: TimeSales returned successfully
+        type: string
+        x-go-name: Message
+      status:
+        description: it can either be success, error
+        example: succes
+        type: string
+        x-go-name: Status
+      timesales:
+        items:
+          $ref: '#/definitions/TimeSale'
+        type: array
+        x-go-name: TimeSales
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/timesale
+  timesaleRequestBody:
+    properties:
+      item_id:
+        description: timesale ID
+        example: bsjcnesolxmsadkxmsdzxmk
+        type: string
+        x-go-name: ItemID
+      shipping_details:
+        $ref: '#/definitions/ShippingDetails'
+    required:
+    - item_id
+    - shipping_details
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/order
+  timesaleResponse:
+    properties:
+      categories:
+        description: categories of the product
+        example: '[]{"Fashion", "Clothing", "Electronics"}'
+        items:
+          type: string
+        minLength: 1
+        type: array
+        x-go-name: Categories
+      countdown:
+        description: |-
+          the number of time in seconds the product timer
+          is supposed to count
+        example: 30
+        format: int64
+        type: integer
+        x-go-name: CountDown
+      id:
+        description: id of the timesale
+        example: UsiJauKa9mAhMsjAnsljMs
+        readOnly: true
+        type: string
+        x-go-name: ID
+      locations:
+        description: location where the product should show
+        example: '[]{"Rivers State", "Lagos State", "Abia State"}'
+        items:
+          type: string
+        minLength: 1
+        type: array
+        x-go-name: Locations
+      price:
+        example: 12.49
+        format: double
+        minimum: 1
+        type: number
+        x-go-name: Price
+      product_id:
+        description: time sale product id
+        example: UsiJauKa9mAhMsjAnsljMs
+        type: object
+        x-go-name: ProductID
+      product_image:
+        description: product image
+        example: https://res-console.cloudinary.com/timiun1/thumbnails/v1/image/upload/v1602505281/YW5kcm9pZF9mY3pmYzg=/preview
+        type: string
+        x-go-name: ProductImage
+      product_name:
+        description: |-
+          timesale product name
+          example; Iphone 12
+        type: string
+        x-go-name: ProductName
+      shop_price:
+        description: shop price in Naira
+        example: 300000.89
+        format: double
+        minimum: 1
+        type: number
+        x-go-name: ShopPrice
+      start_time:
+        description: the time the time sale will begin
+        example: 2020/12/22 20:30:23
+        format: date-time
+        type: string
+        x-go-name: StartTime
+      status:
+        description: timesale status
+        example: available
+        type: string
+        x-go-name: Status
+    required:
+    - price
+    - shop_price
+    - product_id
+    - categories
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/timesale
+  updateData:
+    properties:
+      address:
+        example: no 33 test street
+        minLength: 10
+        type: string
+        x-go-name: Address
+      email:
+        example: hello@u.com
+        type: string
+        uniqueItems: true
+        x-go-name: Email
+      fullname:
+        example: my fullname
+        type: string
+        x-go-name: FullName
+      interests:
+        example:
+        - clothing
+        - fashion
+        items:
+          type: string
+        minLength: 1
+        type: array
+        x-go-name: Interests
+      password:
+        example: passwoRD
+        type: string
+        x-go-name: Password
+      phone:
+        example: "07950597069505"
+        type: string
+        x-go-name: Phone
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/user
+  updateRequestBody:
+    properties:
+      item_id:
+        example: 53snws832qsjasjasnqsanws2
+        type: string
+        x-go-name: ItemID
+      quantity:
+        example: 10
+        format: int64
+        type: integer
+        x-go-name: Quantity
+    required:
+    - item_id
+    - quantity
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/cart
+  userOrdersResponse:
+    properties:
+      message:
+        example: Orders returned successfully !
+        type: string
+        x-go-name: Message
+      orders:
+        items:
+          $ref: '#/definitions/Order'
+        type: array
+        x-go-name: Orders
+      status:
+        example: success
+        type: string
+        x-go-name: Status
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/order
+  userWinningsResponse:
+    properties:
+      message:
+        example: User winnnings returned successfully
+        type: string
+        x-go-name: Message
+      status:
+        example: success
+        type: string
+        x-go-name: Status
+      winnings:
+        items:
+          $ref: '#/definitions/TimeSale'
+        type: array
+        x-go-name: Winnings
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/timesale
+  verifyData:
+    properties:
+      activation_code:
+        example: 8392
+        format: int64
+        type: integer
+        x-go-name: ActivationCode
+      email:
+        example: test@example.com
+        type: string
+        x-go-name: Email
+    required:
+    - email
+    - activation_code
+    type: object
+    x-go-package: github.com/Meghee/timiun-time-market-api/controllers/v1/registration
+host: timiun-pre-release.herokuapp.com
+info:
+  description: Documentation of our timiun API.
+  title: contains documentation write ups for swagger API doc.
+  version: 1.0.0
+paths:
+  /v1/auth/forgot-password:
+    post:
+      description: |-
+        It returns {success} response status if everything worked fine.
+
+        It returns {error} response status if an error occured.
+
+        It returns {activate} response status if the user account has not been activated.
+      operationId: v1-ForgotPassword
+      parameters:
+      - in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/forgotPasswordData'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+      produces:
+        - application/json
+        - application/xml
+      consumes:
+        - application/json
+        - application/xml
+      summary: Forgot password endpoint
+      tags:
+      - auth
+  /v1/auth/login:
+    post:
+      description: User authentication
+      operationId: v1-LoginUser
+      parameters:
+      - in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/loginData'
+      responses:
+        "200":
+          $ref: '#/responses/jwtResponse'
+        "400":
+          $ref: '#/responses/jwtResponse'
+      tags:
+      - auth
+  /v1/auth/reset-password:
+    post:
+      description: |-
+        It returns {success} response status if everything worked fine.
+
+        It returns {error} response status if an error occured.
+
+        It returns {resend} response status if the user hasn't requested to reset password.
+      operationId: v1-ResetPassword
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/resetPasswordData'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+      summary: Reset password endpoint
+      tags:
+      - auth
+  /v1/cart:
+    delete:
+      description: Delete cart item
+      operationId: v1-DeleteCartItem
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/deleteRequestBody'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - cart
+    get:
+      description: Get cart items
+      operationId: v1-GetCartItems
+      responses:
+        "200":
+          $ref: '#/responses/v1-getCartItems'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - cart
+    patch:
+      description: Update cart item
+      operationId: v1-UpdateCartItem
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/updateRequestBody'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - cart
+    post:
+      description: Add to cart
+      operationId: v1-AddToCart
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/addRequestBody'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - cart
+  /v1/merchants/:
+    post:
+      operationId: v1-Register-Merchant
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      summary: Register merchant endpoint.
+      tags:
+      - merchants
+  /v1/orders/:
+    post:
+      operationId: v1-PlaceOrder
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/OrderRequestBody'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      summary: v1 General order endpoint.
+      tags:
+      - orders
+  /v1/orders/ecommerce:
+    post:
+      description: Place e-commerce order
+      operationId: v1-Ecommerce-Order
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/ecommerceRequestBody'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - orders
+  /v1/orders/pay/ecommerce/{user}?details={base64JSON}:
+    get:
+      description: Ecommerce order bank payment
+      operationId: v1-Ecommerce-Order-Bank-Payment
+      produces:
+      - application/html
+      responses: {}
+      tags:
+      - orders
+  /v1/orders/pay/special-offer/{user}?details={base64JSON}:
+    get:
+      description: Special Offer order bank payment
+      operationId: v1-Special-Offer-Order-Bank-Payment
+      produces:
+      - application/html
+      responses: {}
+      tags:
+      - orders
+  /v1/orders/pay/timesale/{user}?details={base64JSON}:
+    get:
+      description: Time Market order bank payment
+      operationId: v1-TimeSale-Order-Bank-Payment
+      produces:
+      - application/html
+      responses: {}
+      tags:
+      - orders
+  /v1/orders/price-calculator:
+    get:
+      operationId: v1-OrderPriceCalculator
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      summary: Returns order total price, shipping cost and bank charge.
+      tags:
+      - orders
+  /v1/orders/specialoffer:
+    post:
+      description: Place special offer order
+      operationId: v1-Special-Offer-Order
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/ecommerceRequestBody'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - orders
+  /v1/orders/timesale:
+    post:
+      description: Place timesale order
+      operationId: v1-TimeSale-Order
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/timesaleRequestBody'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - orders
+  /v1/orders/user/{userID}:
+    get:
+      description: Get user orders
+      operationId: v1-User-Orders
+      responses:
+        "200":
+          $ref: '#/responses/v1-GetUserOrders'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - orders
+  /v1/payments/monnify/pay/{userId}:
+    get:
+      description: |-
+        Make monnify payment passing in the amount in the query string
+        e.g /v1/payments/monnify/pay/userId?amount=1000
+      operationId: v1-MonnifyMakePayment
+      produces:
+      - application/html
+      responses: {}
+      tags:
+      - payments
+  /v1/payments/monnify/webhook:
+    post:
+      description: Monnify web hook endpoint
+      operationId: v1-MonnifyWebHook
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - payments
+  /v1/products/:
+    post:
+      description: Adds a new product
+      operationId: v1-AddProduct
+      parameters:
+      - in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/Product'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - products
+  /v1/products/{product_url}:
+    get:
+      operationId: v1-ProductDetails
+      responses:
+        "200":
+          $ref: '#/responses/v1-productDetailsResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      summary: Product details endpoint.
+      tags:
+      - products
+  /v1/products/filter/categories:
+    post:
+      description: Filter products by categories
+      operationId: v1-FilterProductsByCategories
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/categoriesData'
+      responses:
+        "200":
+          $ref: '#/responses/v1-UserProducts'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - products
+  /v1/products/paginate/{merchant}/{start}/{limit}:
+    get:
+      description: Products pagination
+      operationId: v1-ProductPaginate
+      responses:
+        "200":
+          $ref: '#/responses/v1-productSearchResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - products
+  /v1/products/search?query={text}:
+    get:
+      description: |-
+        Search for products
+        the {text} should be parsed to be url compactible i.e "hello world ++"
+        should be "hello+world+%2B%2B"
+      operationId: v1-ProductSearch
+      responses:
+        "200":
+          $ref: '#/responses/v1-productSearchResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - products
+  /v1/registration/activate:
+    put:
+      description: Activate user account
+      operationId: v1-RegistrationActivate
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/activationData'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - registration
+  /v1/registration/reactivate:
+    post:
+      description: Resend Activation Code
+      operationId: v1-ResendActivationCode
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/resendActivationCodeData'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - registration
+  /v1/registration/register:
+    post:
+      description: New user registration
+      operationId: v1-RegistrationRegister
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/registerData'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - registration
+  /v1/registration/verify:
+    post:
+      description: Verify user activation code
+      operationId: v1-RegistrationVerify
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/verifyData'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - registration
+  /v1/specialoffers/available:
+    get:
+      description: Get available special offers
+      operationId: v1-Get-Available-Special-Offers
+      responses:
+        "200":
+          $ref: '#/responses/v1-GetAvailableSpecialOffers'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      tags:
+      - special-offer
+  /v1/timesales/{timesaleId}/websocket:
+    get:
+      description: |-
+        url example: /v1/timesales/{timesaleId}/websocket?jwt={jwtToken}
+        this uses wss:// instead of https://
+      operationId: v1-TimesaleWebsocket
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/generalWebsocketMessage'
+      responses:
+        "200":
+          $ref: '#/responses/v1-TimesaleWebsocketResponse'
+      security:
+      - jwt_auth:
+        - get_parameter
+      summary: Timesale websocket endpoint.
+      tags:
+      - timesales
+  /v1/timesales/{timesaleId}/websocket-chat:
+    get:
+      description: |-
+        url example: /v1/timesales/{timesaleId}/websocket-chat?jwt={jwtToken}
+        this uses wss:// instead of https://
+      operationId: v1-TimesaleWebsocketChat
+      responses:
+        "200":
+          $ref: '#/responses/v1-TimesaleWebsocketResponse'
+      security:
+      - jwt_auth:
+        - get_parameter
+      summary: Timesale websocket chat endpoint.
+      tags:
+      - timesales
+  /v1/timesales/{timesaleId}/websocket-counter:
+    get:
+      description: |-
+        url example: /v1/timesales/{timesaleId}/websocket-counter?jwt={jwtToken}
+        this uses wss:// instead of https://
+      operationId: v1-TimesaleWebsocketCounter
+      responses:
+        "200":
+          $ref: '#/responses/v1-TimesaleWebsocketResponse'
+      security:
+      - jwt_auth:
+        - get_parameter
+      summary: Timesale websocket counter endpoint.
+      tags:
+      - timesales
+  /v1/timesales/{userID}/winnings:
+    get:
+      operationId: v1-TimeSaleUserWinnings
+      responses:
+        "200":
+          $ref: '#/responses/v1-TimeSaleUserWinnings'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      summary: Get user timesale winnings.
+      tags:
+      - timesales
+  /v1/timesales/filter/categories:
+    post:
+      description: Get timesales by categories and status
+      operationId: v1-FilterTimesalesByCategories
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/categoriesFilterData'
+      responses:
+        "200":
+          $ref: '#/responses/v1-UserTimesales'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - timesales
+  /v1/timesales/search?query={text}:
+    get:
+      description: |-
+        Search for timesales
+        the {text} should be parsed to be url compactible i.e "hello world ++"
+        should be "hello+world+%2B%2B"
+      operationId: v1-TimeSaleSearch
+      responses:
+        "200":
+          $ref: '#/responses/v1-timesaleSearchResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - timesales
+  /v1/timesales/user/{userID}:
+    get:
+      description: Get recommended timesales for a user
+      operationId: v1-GetUserRecommendedTimesales
+      responses:
+        "200":
+          $ref: '#/responses/v1-UserTimesales'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - timesales
+  /v1/timesales/won:
+    get:
+      description: Get timesale won items
+      operationId: v1-Time-Sale-Won-Items
+      responses:
+        "200":
+          $ref: '#/responses/v1-UserTimesales'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - timesales
+  /v1/users/{userId}:
+    get:
+      description: Get user details
+      operationId: v1-GetUserProfile
+      responses:
+        "200":
+          $ref: '#/responses/v1-UserProfile'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - users
+    put:
+      description: Update user details
+      operationId: v1-UpdateUser
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/updateData'
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - users
+  /v1/users/{userId}/ref-bonus/transfer:
+    post:
+      description: Transfer user ref bonus to wallet
+      operationId: v1-TransferRefBonus
+      responses:
+        "200":
+          $ref: '#/responses/apiResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - users
+  /v1/users/{userId}/referrals:
+    get:
+      description: Get user referrals
+      operationId: v1-GetReferrals
+      responses:
+        "200":
+          $ref: '#/responses/v1-UserGetReferralsResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - users
+  /v1/users/{userId}/wallet/transfer:
+    post:
+      description: Transfer user credit
+      operationId: v1-TransferCredit
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/TransferCreditParameter'
+      responses:
+        "200":
+          $ref: '#/responses/v1-UserTransferCreditResponse'
+        "400":
+          $ref: '#/responses/apiErrResponse'
+        "401":
+          $ref: '#/responses/apiUnauthorizedResponse'
+        "500":
+          $ref: '#/responses/apiErrResponse'
+      security:
+      - jwt_auth:
+        - read
+      tags:
+      - users
+produces:
+- application/json
+responses:
+  apiErrResponse:
+    description: General error response for api requests
+    schema:
+      properties:
+        message:
+          description: Api response message to display to clients
+          example: an error occured while performing action
+          type: string
+          x-go-name: Message
+        status:
+          description: |-
+            Status of the request;
+            it can either be error, warning
+          example: error
+          type: string
+          x-go-name: Status
+      required:
+      - status
+      - message
+      type: object
+  apiResponse:
+    description: General response for api requests
+    schema:
+      $ref: '#/definitions/APIResponse'
+  apiUnauthorizedResponse:
+    description: Unauthorized error response
+    schema:
+      properties:
+        message:
+          description: Api response message to display to clients
+          example: you are not authorized to proceed
+          type: string
+          x-go-name: Message
+        status:
+          description: |-
+            Status of the request;
+            it can either be error
+          example: error
+          type: string
+          x-go-name: Status
+      required:
+      - status
+      - message
+      type: object
+  jwtResponse:
+    description: JWT response to return jwt back to client
+    schema:
+      $ref: '#/definitions/JWTResponse'
+  v1-GetAvailableSpecialOffers:
+    description: Get available special offers response.
+    schema:
+      $ref: '#/definitions/getAvailableResponse'
+  v1-GetUserOrders:
+    description: Get user orders api response.
+    schema:
+      $ref: '#/definitions/userOrdersResponse'
+  v1-TimeSaleUserWinnings:
+    description: ""
+    schema:
+      $ref: '#/definitions/userWinningsResponse'
+  v1-TimesaleWebsocketResponse:
+    description: timesale websocket response
+    schema:
+      $ref: '#/definitions/generalWebsocketMessage'
+  v1-UserGetReferralsResponse:
+    description: Response for get user referrals.
+    schema:
+      $ref: '#/definitions/GetReferralsResponse'
+  v1-UserProducts:
+    description: User Products response
+    schema:
+      $ref: '#/definitions/productsResponse'
+  v1-UserProfile:
+    description: Get user profile success response.
+    schema:
+      $ref: '#/definitions/GetProfileResponse'
+  v1-UserTimesales:
+    description: User Timesales response
+    schema:
+      properties:
+        message:
+          description: response message
+          example: Products generated successfully
+          type: string
+          x-go-name: Message
+        status:
+          description: response status
+          example: success
+          type: string
+          x-go-name: Status
+        timesales:
+          description: timesales
+          items:
+            $ref: '#/definitions/timesaleResponse'
+          type: array
+          x-go-name: Timesales
+      type: object
+  v1-UserTransferCreditResponse:
+    description: Transfer user credit reponse.
+    schema:
+      $ref: '#/definitions/TransferCreditResponse'
+  v1-getCartItems:
+    description: Get cart items api response.
+    schema:
+      $ref: '#/definitions/getCartItemsResponse'
+  v1-productDetailsResponse:
+    description: Product details response.
+    schema:
+      $ref: '#/definitions/productResponse'
+  v1-productSearchResponse:
+    description: Product search response.
+    schema:
+      $ref: '#/definitions/searchResponse'
+  v1-timesaleSearchResponse:
+    description: TimeSale search response.
+    schema:
+      $ref: '#/definitions/searchResponse'
+schemes:
+- https
+securityDefinitions:
+  jwt_auth:
+    type: jwt
+swagger: "2.0"
