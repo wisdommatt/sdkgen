@@ -7,6 +7,7 @@ import (
     "net/http"
     "io"
     "encoding/json"
+    "encoding/xml"
     "bytes"
     "context"
     "fmt"
@@ -99,6 +100,16 @@ func (c *APIClient) makeHttpRequest(ctx context.Context, method, path string, re
 	return resp, err
 }
 
+func (c *APIClient) decodeResponse(body io.Reader, contentType string, v interface{}) error {
+    if strings.EqualFold(contentType, "application/json") {
+        err := json.NewDecoder(body).Decode(v)
+        return err
+    } else if strings.EqualFold(contentType, "application/xml") {
+        err := xml.NewDecoder(body).Decode(v)
+        return err
+    }
+    return fmt.Errorf("invalid response content type: %s", contentType)
+}
 
 {{ range $apiName, $apiInfo := $schema.ApiPathsMap }}
 
@@ -127,7 +138,8 @@ func (s *{{ toCamelCase $apiName }}API) {{ $methodName }}(ctx context.Context {{
 		return nil, err
 	}
     defer httpResponse.Body.Close()
-    err = json.NewDecoder(httpResponse.Body).Decode(&response)
+    contentType := httpResponse.Header.Get("Content-Type")
+    err = s.client.decodeResponse(httpResponse.Body, contentType, &response)
 	if err != nil {
         return nil, err
 	}
