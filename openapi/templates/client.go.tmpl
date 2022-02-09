@@ -126,14 +126,12 @@ func (s *{{ toCamelCase $apiName }}API) {{ $methodName }}(ctx context.Context {{
 	if err != nil {
 		return nil, err
 	}
-	if httpResponse.StatusCode == 300 {
-        return nil, fmt.Errorf("")
-		// return nil, &SendSmsBadRequestError{Response: response}
+    defer httpResponse.Body.Close()
+    err = json.NewDecoder(httpResponse.Body).Decode(&response)
+	if err != nil {
+        return nil, err
 	}
-	if httpResponse.StatusCode == http.StatusForbidden {
-		// return nil, &SendSmsForbiddenError{Response: response}
-	}
-    panic("unimplemented")
+    return &response, nil
 }
 
 {{ end }}
