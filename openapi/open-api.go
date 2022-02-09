@@ -34,7 +34,7 @@ type Property struct {
 	Schema *Property `json:"schema" yaml:"schema"`
 }
 
-func (p *Property) IsRequired(str string) bool {
+func (p Property) IsRequired(str string) bool {
 	for _, r := range p.Required {
 		if r == str {
 			return true
@@ -111,15 +111,16 @@ var (
 		"int32":       "int",
 		"int":         "int",
 		"float64":     "float64",
-		"interface{}": "object",
+		"interface{}": "interface{}",
+		"time.Time":   "time.Time",
 	}
 
 	templateFuncs template.FuncMap = template.FuncMap{
 		"toCamelCase": func(str string) string {
 			return strcase.ToCamel(str)
 		},
-		"extractTypeName": func(schema *OpenAPISchema, parentName string, property Property) TypeName {
-			return extractTypeName(schema, parentName, property)
+		"extractTypeName": func(schema *OpenAPISchema, property Property) TypeName {
+			return extractTypeName(schema, property)
 		},
 		"toUpperCase": func(str string) string {
 			return strings.ToUpper(str)
@@ -145,9 +146,9 @@ var (
 					continue
 				}
 				for name, prop := range definition.Properties {
-					fieldType := extractTypeName(schema, responseName, prop)
+					fieldType := extractTypeName(schema, prop)
 					prefix := ""
-					if !definition.IsRequired(name) && !fieldType.IsArray() && !fieldType.IsBuiltIn() {
+					if !definition.IsRequired(name) && !fieldType.IsNullable() && !fieldType.IsBuiltIn() {
 						prefix = "*"
 					}
 					existingField, ok := fieldsMap[name]
@@ -172,13 +173,20 @@ var (
 			}
 			return responseType + "}"
 		},
+		"pointerPrefix": func(property Property, fieldName string, typeName TypeName) TypeName {
+			if !property.IsRequired(fieldName) && !typeName.IsBuiltIn() && !typeName.IsNullable() {
+				return "*" + typeName
+			}
+			return typeName
+		},
 	}
 )
 
 type TypeName string
 
-func (t TypeName) IsArray() bool {
-	return strings.Contains(string(t), "[]")
+func (t TypeName) IsNullable() bool {
+	str := t.String()
+	return strings.Contains(str, "[") || strings.Contains(str, "*")
 }
 
 func (t TypeName) IsBuiltIn() bool {
@@ -192,7 +200,7 @@ func (t TypeName) String() string {
 
 // extractTypeName is a helper function for extracting property type name
 // as Go type or custom type name.
-func extractTypeName(schema *OpenAPISchema, parentName string, property Property) TypeName {
+func extractTypeName(schema *OpenAPISchema, property Property) TypeName {
 	res := property.Type
 	if property.Format != "" {
 		res = property.Format
@@ -202,11 +210,7 @@ func extractTypeName(schema *OpenAPISchema, parentName string, property Property
 	}
 	if refName, ok := schema.RefMap[property.Ref]; ok {
 		// return non-required types as pointers
-		if refName == parentName {
-			res = "*" + strcase.ToCamel(refName)
-		} else {
-			res = strcase.ToCamel(refName)
-		}
+		res = strcase.ToCamel(refName)
 	}
 	if property.Type != "array" && res != "object" {
 		return TypeName(res)
@@ -227,7 +231,7 @@ func extractTypeName(schema *OpenAPISchema, parentName string, property Property
 	mapPrefix := ""
 	for additionalProperties != nil {
 		mapPrefix += "map[string]"
-		typeName := extractTypeName(schema, parentName, *additionalProperties)
+		typeName := extractTypeName(schema, *additionalProperties)
 		res = typeName.String()
 		additionalProperties = additionalProperties.AdditionalProperties
 	}

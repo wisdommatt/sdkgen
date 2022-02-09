@@ -19,13 +19,13 @@ import (
 {{ if eq $definition.Type "object" }}
 
 type {{ toCamelCase $name }} struct {
-    {{ range $propName, $prop := $definition.Properties }} {{ toCamelCase $propName }} {{ extractTypeName $schema $name $prop }} `json:"{{ $propName }},omitempty"` 
+    {{ range $propName, $prop := $definition.Properties }} {{ toCamelCase $propName }} {{ (pointerPrefix $definition $propName (extractTypeName $schema $prop)) }} `json:"{{ $propName }},omitempty"` 
     {{ end }}
 }
 
 {{ else }}
 
-type {{ toCamelCase $name }} {{ extractTypeName $schema $name $definition }}
+type {{ toCamelCase $name }} {{ extractTypeName $schema $definition }}
 
 {{ end }}
 {{ end }}
@@ -34,7 +34,7 @@ type {{ toCamelCase $name }} {{ extractTypeName $schema $name $definition }}
 {{ if eq $response.Schema.Type "object" }}
 
 type {{ toCamelCase $name }} struct {
-    {{ range $propName, $prop := $response.Schema.Properties}} {{ toCamelCase $propName }} {{ extractTypeName $schema $name $prop }} `json:"{{ $propName }}"` 
+    {{ range $propName, $prop := $response.Schema.Properties}} {{ toCamelCase $propName }} {{ extractTypeName $schema $prop }} `json:"{{ $propName }}"` 
     {{ end }}
 }
 
@@ -120,7 +120,7 @@ type {{ toCamelCase $apiName }}API struct {
 {{ range $path, $pathInfoMap := $apiInfo }}
 {{ range $httpMethod, $pathInfo := $pathInfoMap }}
 
-{{ $input := print ",input " (extractTypeName $schema "" (pathParameterToProperty $pathInfo.Parameters)) }}
+{{ $input := print ",input " (extractTypeName $schema (pathParameterToProperty $pathInfo.Parameters)) }}
 {{ if eq $input ",input " }}
 {{ $input = "" }}
 {{ end }}
