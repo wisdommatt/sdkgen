@@ -1459,6 +1459,12 @@ paths:
           $ref: '#/responses/apiResponse'
         "400":
           $ref: '#/responses/apiErrResponse'
+      produces:
+        - application/json
+        - application/xml
+      consumes:
+        - application/json
+        - application/xml
       summary: Forgot password endpoint
       tags:
       - auth
