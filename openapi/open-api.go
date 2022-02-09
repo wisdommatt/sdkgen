@@ -34,6 +34,15 @@ type Property struct {
 	Schema *Property `json:"schema" yaml:"schema"`
 }
 
+func (p *Property) IsRequired(str string) bool {
+	for _, r := range p.Required {
+		if r == str {
+			return true
+		}
+	}
+	return false
+}
+
 type Info struct {
 	Description string `json:"description" yaml:"description"`
 	Title       string `json:"title" yaml:"title"`
@@ -90,83 +99,26 @@ type SecurityDefinition struct {
 	} `json:"scopes"`
 }
 
-// extractTypeName is a helper function for extracting property type name
-// as Go type or custom type name.
-func extractTypeName(schema *OpenAPISchema, parentName string, property Property) string {
-	res := property.Type
-	if property.Format != "" {
-		res = property.Format
-	}
-	if typeName, ok := builtInTypesMap[res]; ok {
-		res = typeName
-	}
-	if refName, ok := schema.RefMap[property.Ref]; ok {
-		// return non-required types as pointers
-		if refName == parentName {
-			res = "*" + strcase.ToCamel(refName)
-		} else {
-			res = strcase.ToCamel(refName)
-		}
-	}
-	if property.Type != "array" && res != "object" {
-		return res
-	}
-	if property.Items != nil {
-		if property.Items.Type != "" {
-			res = property.Items.Type
-		}
-		if refName, ok := schema.RefMap[property.Items.Ref]; ok {
-			res = strcase.ToCamel(refName)
-		}
-	}
-	if res != "object" {
-		return "[]" + res
-	}
-	// if property has additional properties then it is a map.
-	additionalProperties := property.AdditionalProperties
-	mapPrefix := ""
-	for additionalProperties != nil {
-		mapPrefix += "map[string]"
-		res = extractTypeName(schema, parentName, *additionalProperties)
-		additionalProperties = additionalProperties.AdditionalProperties
-	}
-	if mapPrefix != "" {
-		return mapPrefix + res
-	}
-	return "interface{}"
-}
-
-func extractRootDefinition(schema *OpenAPISchema, ref string) *Property {
-	definition, ok := schema.RefPropertyMap[ref]
-	if !ok {
-		return nil
-	}
-	if strings.Contains(ref, "definitions") {
-		return &definition
-	}
-	if definition.Schema == nil || definition.Schema.Ref == "" {
-		return definition.Schema
-	}
-	return extractRootDefinition(schema, definition.Schema.Ref)
-}
-
 var (
 	builtInTypesMap = map[string]string{
-		"string":    "string",
-		"boolean":   "bool",
-		"integer":   "int",
-		"number":    "float64",
-		"date-time": "time.Time",
-		"double":    "float64",
-		"int64":     "int",
-		"int32":     "int",
+		"string":      "string",
+		"boolean":     "bool",
+		"integer":     "int",
+		"number":      "float64",
+		"date-time":   "time.Time",
+		"double":      "float64",
+		"int64":       "int",
+		"int32":       "int",
+		"int":         "int",
+		"float64":     "float64",
+		"interface{}": "object",
 	}
 
 	templateFuncs template.FuncMap = template.FuncMap{
 		"toCamelCase": func(str string) string {
 			return strcase.ToCamel(str)
 		},
-		"extractTypeName": func(schema *OpenAPISchema, parentName string, property Property) string {
+		"extractTypeName": func(schema *OpenAPISchema, parentName string, property Property) TypeName {
 			return extractTypeName(schema, parentName, property)
 		},
 		"toUpperCase": func(str string) string {
@@ -193,10 +145,14 @@ var (
 					continue
 				}
 				for name, prop := range definition.Properties {
-					fieldName := extractTypeName(schema, responseName, prop)
+					fieldType := extractTypeName(schema, responseName, prop)
+					prefix := ""
+					if !definition.IsRequired(name) && !fieldType.IsArray() && !fieldType.IsBuiltIn() {
+						prefix = "*"
+					}
 					existingField, ok := fieldsMap[name]
-					if existingField == "interface{}" || !ok || existingField == fieldName {
-						fieldsMap[name] = fieldName
+					if existingField == "interface{}" || !ok || existingField == fieldType.String() {
+						fieldsMap[name] = prefix + fieldType.String()
 						continue
 					}
 					fieldsMap[name] = "interface{}"
@@ -207,12 +163,93 @@ var (
 			}
 			responseType := "struct { \n"
 			for fieldName, fieldType := range fieldsMap {
-				responseType += fmt.Sprintf("%s %s `json:\"%s\"` \n", strcase.ToCamel(fieldName), fieldType, fieldName)
+				responseType += fmt.Sprintf(
+					"%s %s `json:\"%s,omitempty\"` \n",
+					strcase.ToCamel(fieldName),
+					fieldType,
+					fieldName,
+				)
 			}
 			return responseType + "}"
 		},
 	}
 )
+
+type TypeName string
+
+func (t TypeName) IsArray() bool {
+	return strings.Contains(string(t), "[]")
+}
+
+func (t TypeName) IsBuiltIn() bool {
+	_, ok := builtInTypesMap[string(t)]
+	return ok
+}
+
+func (t TypeName) String() string {
+	return string(t)
+}
+
+// extractTypeName is a helper function for extracting property type name
+// as Go type or custom type name.
+func extractTypeName(schema *OpenAPISchema, parentName string, property Property) TypeName {
+	res := property.Type
+	if property.Format != "" {
+		res = property.Format
+	}
+	if typeName, ok := builtInTypesMap[res]; ok {
+		res = typeName
+	}
+	if refName, ok := schema.RefMap[property.Ref]; ok {
+		// return non-required types as pointers
+		if refName == parentName {
+			res = "*" + strcase.ToCamel(refName)
+		} else {
+			res = strcase.ToCamel(refName)
+		}
+	}
+	if property.Type != "array" && res != "object" {
+		return TypeName(res)
+	}
+	if property.Items != nil {
+		if property.Items.Type != "" {
+			res = property.Items.Type
+		}
+		if refName, ok := schema.RefMap[property.Items.Ref]; ok {
+			res = strcase.ToCamel(refName)
+		}
+	}
+	if res != "object" {
+		return TypeName("[]" + res)
+	}
+	// if property has additional properties then it is a map.
+	additionalProperties := property.AdditionalProperties
+	mapPrefix := ""
+	for additionalProperties != nil {
+		mapPrefix += "map[string]"
+		typeName := extractTypeName(schema, parentName, *additionalProperties)
+		res = typeName.String()
+		additionalProperties = additionalProperties.AdditionalProperties
+	}
+	if mapPrefix != "" {
+		return TypeName(mapPrefix + res)
+	}
+	return "interface{}"
+}
+
+func extractRootDefinition(schema *OpenAPISchema, ref string) *Property {
+	definition, ok := schema.RefPropertyMap[ref]
+	if !ok {
+		return nil
+	}
+	if strings.Contains(ref, "definitions") {
+		return &definition
+	}
+	if definition.Schema == nil || definition.Schema.Ref == "" {
+		return definition.Schema
+	}
+	return extractRootDefinition(schema, definition.Schema.Ref)
+}
 
 // LoadOpenApiSchema loads open api schema from api schema file.
 func LoadOpenApiSchema(filePath string) (*OpenAPISchema, error) {

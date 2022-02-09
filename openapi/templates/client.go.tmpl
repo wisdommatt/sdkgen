@@ -19,7 +19,7 @@ import (
 {{ if eq $definition.Type "object" }}
 
 type {{ toCamelCase $name }} struct {
-    {{ range $propName, $prop := $definition.Properties }} {{ toCamelCase $propName }} {{ extractTypeName $schema $name $prop }} `json:"{{ $propName }}"` 
+    {{ range $propName, $prop := $definition.Properties }} {{ toCamelCase $propName }} {{ extractTypeName $schema $name $prop }} `json:"{{ $propName }},omitempty"` 
     {{ end }}
 }
 
@@ -149,3 +149,5 @@ func (s *{{ toCamelCase $apiName }}API) {{ $methodName }}(ctx context.Context {{
 {{ end }}
 {{ end }}
 {{ end }}
+
+{{/* TODO(wisdommatt): implement logic for multipart-formdata / file uploads */}}
