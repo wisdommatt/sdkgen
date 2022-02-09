@@ -3,10 +3,10 @@ package openapi
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"os"
 	"strconv"
 	"strings"
+	"text/template"
 
 	"github.com/iancoleman/strcase"
 	"golang.org/x/tools/imports"
@@ -25,11 +25,11 @@ type Property struct {
 	AdditionalProperties *Property           `json:"additionalProperties" yaml:"additionalProperties"`
 	Items                *Property           `json:"items" yaml:"items"`
 	XML                  struct {
-		Name    string `json:"name"`
-		Wrapped bool   `json:"wrapped"`
+		Name    string `json:"name" yaml:"name"`
+		Wrapped bool   `json:"wrapped" yaml:"wrapped"`
 	} `json:"xml"`
 	Default struct {
-		Description string `json:"description"`
+		Description string `json:"description" yaml:"description"`
 	} `json:"default"`
 	Schema *Property `json:"schema" yaml:"schema"`
 }
@@ -50,7 +50,7 @@ type Path struct {
 	Security    []map[string][]string `json:"security" yaml:"security"`
 	Schemes     []string              `json:"schemes" yaml:"schemes"`
 	Consumes    []string              `json:"consumes" yaml:"consumes"`
-	Produces    []string              `json:"produces"`
+	Produces    []string              `json:"produces" yaml:"produces"`
 }
 
 type PathParameter struct {
@@ -58,10 +58,6 @@ type PathParameter struct {
 	In          string   `json:"in" yaml:"in"`
 	Name        string   `json:"name" yaml:"name"`
 	Required    bool     `json:"required" yaml:"required"`
-	Schema      Property `json:"schema" yaml:"schema"`
-}
-type Response struct {
-	Description string   `json:"description" yaml:"description"`
 	Schema      Property `json:"schema" yaml:"schema"`
 }
 
@@ -78,18 +74,19 @@ type OpenAPISchema struct {
 	SecurityDefinitions map[string]SecurityDefinition `json:"securityDefinitions" yaml:"securityDefinitions"`
 	Swagger             string                        `json:"swagger" yaml:"swagger"`
 	RefMap              map[string]string
+	RefPropertyMap      map[string]Property
 	ApiPathsMap         map[string]map[string]map[string]Path
 }
 
 type SecurityDefinition struct {
-	Type             string `json:"type"`
-	Name             string `json:"name"`
-	In               string `json:"in"`
-	AuthorizationURL string `json:"authorizationUrl"`
-	Flow             string `json:"flow"`
+	Type             string `json:"type" yaml:"type"`
+	Name             string `json:"name" yaml:"name"`
+	In               string `json:"in" yaml:"in"`
+	AuthorizationURL string `json:"authorizationUrl" yaml:"authorizationUrl"`
+	Flow             string `json:"flow" yaml:"flow"`
 	Scopes           struct {
-		ReadPets  string `json:"read:pets"`
-		WritePets string `json:"write:pets"`
+		ReadPets  string `json:"read:pets" yaml:"read:pets"`
+		WritePets string `json:"write:pets" yaml:"write:pets"`
 	} `json:"scopes"`
 }
 
@@ -139,6 +136,20 @@ func extractTypeName(schema *OpenAPISchema, parentName string, property Property
 	return "interface{}"
 }
 
+func extractRootDefinition(schema *OpenAPISchema, ref string) *Property {
+	definition, ok := schema.RefPropertyMap[ref]
+	if !ok {
+		return nil
+	}
+	if strings.Contains(ref, "definitions") {
+		return &definition
+	}
+	if definition.Schema == nil || definition.Schema.Ref == "" {
+		return definition.Schema
+	}
+	return extractRootDefinition(schema, definition.Schema.Ref)
+}
+
 var (
 	builtInTypesMap = map[string]string{
 		"string":    "string",
@@ -151,14 +162,6 @@ var (
 		"int32":     "int",
 	}
 
-	builtInGoTypesMap = map[string]string{
-		"string":    "string",
-		"bool":      " boolean",
-		"int":       "integer",
-		"float64":   "double",
-		"time.Time": "date-time",
-	}
-
 	templateFuncs template.FuncMap = template.FuncMap{
 		"toCamelCase": func(str string) string {
 			return strcase.ToCamel(str)
@@ -166,15 +169,6 @@ var (
 		"extractTypeName": func(schema *OpenAPISchema, parentName string, property Property) string {
 			return extractTypeName(schema, parentName, property)
 		},
-		// "definitionToProperty": func(definition Definition) Property {
-		// 	return Property{
-		// 		Description: definition.Description,
-		// 		Type:        definition.Type,
-		// 		Ref:         definition.Ref,
-		// 		Format:      definition.Format,
-		// 		XGoName:     definition.XGoName,
-		// 	}
-		// },
 		"toUpperCase": func(str string) string {
 			return strings.ToUpper(str)
 		},
@@ -191,15 +185,31 @@ var (
 			i, _ := strconv.Atoi(str)
 			return i
 		},
-		"extractResponseTypeFields": func(schema *OpenAPISchema, parentName string, responses map[string]Response) string {
-			fields := ""
-			// fieldsMap := ""
-			// for _, response := range responses {
-			// 	// statusCode, _ := strconv.Atoi(statusCodeStr)
-			// 	// schemaType := extractTypeName(schema, parentName, response.Schema)
-
-			// }
-			return fields
+		"extractResponseType": func(schema *OpenAPISchema, responseName string, responses map[string]Property) string {
+			fieldsMap := map[string]string{}
+			for _, response := range responses {
+				definition := extractRootDefinition(schema, response.Ref)
+				if definition == nil {
+					continue
+				}
+				for name, prop := range definition.Properties {
+					fieldName := extractTypeName(schema, responseName, prop)
+					existingField, ok := fieldsMap[name]
+					if existingField == "interface{}" || !ok || existingField == fieldName {
+						fieldsMap[name] = fieldName
+						continue
+					}
+					fieldsMap[name] = "interface{}"
+				}
+			}
+			if len(fieldsMap) == 0 {
+				return "interface{}"
+			}
+			responseType := "struct { \n"
+			for fieldName, fieldType := range fieldsMap {
+				responseType += fmt.Sprintf("%s %s `json:\"%s\"` \n", strcase.ToCamel(fieldName), fieldType, fieldName)
+			}
+			return responseType + "}"
 		},
 	}
 )
@@ -211,20 +221,23 @@ func LoadOpenApiSchema(filePath string) (*OpenAPISchema, error) {
 		return nil, err
 	}
 	schema := OpenAPISchema{
-		RefMap:      make(map[string]string),
-		ApiPathsMap: make(map[string]map[string]map[string]Path),
+		RefMap:         make(map[string]string),
+		RefPropertyMap: make(map[string]Property),
+		ApiPathsMap:    make(map[string]map[string]map[string]Path),
 	}
 	err = yaml.Unmarshal(fileContents, &schema)
 	if err != nil {
 		return nil, err
 	}
-	for name := range schema.Definitions {
+	for name, property := range schema.Definitions {
 		key := fmt.Sprintf("#/definitions/%s", name)
 		schema.RefMap[key] = name
+		schema.RefPropertyMap[key] = property
 	}
-	for name := range schema.Responses {
+	for name, property := range schema.Responses {
 		key := fmt.Sprintf("#/responses/%s", name)
 		schema.RefMap[key] = name
+		schema.RefPropertyMap[key] = property
 	}
 	// extracting API paths based on path tags.
 	for path := range schema.Paths {

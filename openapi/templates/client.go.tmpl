@@ -115,13 +115,9 @@ type {{ toCamelCase $apiName }}API struct {
 {{ end }}
 
 {{ $methodName := toCamelCase $pathInfo.OperationID }}
-{{ $responseType := print $methodName "Response"}}
+{{ $responseType := print $methodName "ApiResponse"}}
 
-type {{ $responseType }} struct {
-    {{ range $statusCode, $definition := $pathInfo.Responses }}
-
-    {{ end }}
-}
+type {{ $responseType }} {{ extractResponseType $schema $responseType $pathInfo.Responses }}
 
 func (s *{{ toCamelCase $apiName }}API) {{ $methodName }}(ctx context.Context {{ $input }}) (*{{ $responseType }}, error) {
     var response {{ $responseType }}
