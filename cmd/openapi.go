@@ -18,14 +18,14 @@ package cmd
 import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"github.com/wisdommatt/sdkgen/graphql"
+	"github.com/wisdommatt/sdkgen/openapi"
 	"github.com/wisdommatt/sdkgen/pkg/log"
 )
 
-// graphqlCmd represents the graphql command
-var graphqlCmd = &cobra.Command{
-	Use:   "graphql",
-	Short: "Generate SDK client from graphql schema",
+// openapiCmd represents the openapi command
+var openapiCmd = &cobra.Command{
+	Use:   "openapi",
+	Short: "Generate SDK client from openapi | swagger schema file",
 	Run: func(cmd *cobra.Command, args []string) {
 		schemaFile, _ := cmd.Flags().GetString("schema")
 		if schemaFile == "" {
@@ -35,7 +35,7 @@ var graphqlCmd = &cobra.Command{
 		if output == "" {
 			log.Fatalln(color.FgRed, "ERROR", "--output is required")
 		}
-		err := graphql.GenerateGoSDK(schemaFile, output)
+		err := openapi.GenerateGoSDK(schemaFile, output)
 		if err != nil {
 			log.Fatalln(color.FgRed, "ERROR", err.Error())
 		}
@@ -44,16 +44,16 @@ var graphqlCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(graphqlCmd)
+	rootCmd.AddCommand(openapiCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	graphqlCmd.Flags().String("schema", "", "path to graphql schema file")
-	graphqlCmd.Flags().String("output", "", "name/path of generated client package")
+	openapiCmd.Flags().String("schema", "", "path to openapi | swagger schema file")
+	openapiCmd.Flags().String("output", "", "name/path of generated client package")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// graphqlCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// openapiCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
