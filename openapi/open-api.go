@@ -3,6 +3,7 @@ package openapi
 import (
 	"bytes"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -270,9 +271,18 @@ func LoadOpenApiSchema(filePath string) (*OpenAPISchema, error) {
 		RefPropertyMap: make(map[string]Property),
 		ApiPathsMap:    make(map[string]map[string]map[string]Path),
 	}
-	err = yaml.Unmarshal(fileContents, &schema)
-	if err != nil {
-		return nil, err
+	if strings.HasSuffix(filePath, ".yaml") || strings.HasSuffix(filePath, ".yml") {
+		err = yaml.Unmarshal(fileContents, &schema)
+		if err != nil {
+			return nil, err
+		}
+	} else if strings.HasSuffix(filePath, ".json") {
+		err = json.Unmarshal(fileContents, &schema)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, fmt.Errorf("provide a valid json / yaml schema file")
 	}
 	for name, property := range schema.Definitions {
 		key := fmt.Sprintf("#/definitions/%s", name)
