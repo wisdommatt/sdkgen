@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"os"
 	"strings"
@@ -40,6 +41,9 @@ func NewSchema(astSchema *ast.Schema) *Schema {
 }
 
 var (
+	//go:embed templates/client.go.tmpl
+	clientTemplateFile string
+
 	graphqlDefaultFieldsMap = map[string]string{
 		"Int":     "int",
 		"String":  "string",
@@ -234,8 +238,7 @@ func GenerateGoSDK(schemaFile string, outputDirectory string) error {
 		return err
 	}
 	outFile := outputDirectory + "/client.go"
-	clientTmp, err := template.New("client.go.tmpl").Funcs(templateFuncs).
-		ParseFiles("graphql/templates/client.go.tmpl")
+	clientTmp, err := template.New("client.go.tmpl").Funcs(templateFuncs).Parse(clientTemplateFile)
 	if err != nil {
 		return err
 	}

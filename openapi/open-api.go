@@ -2,6 +2,7 @@ package openapi
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"os"
 	"strconv"
@@ -100,6 +101,9 @@ type SecurityDefinition struct {
 }
 
 var (
+	//go:embed templates/client.go.tmpl
+	clientTemplateFile string
+
 	builtInTypesMap = map[string]string{
 		"string":      "string",
 		"boolean":     "bool",
@@ -308,7 +312,7 @@ func GenerateGoSDK(schemaFile string, outDir string) error {
 		return err
 	}
 	outFile := outDir + "/client.go"
-	t, err := template.New("client.go.tmpl").Funcs(templateFuncs).ParseFiles("openapi/templates/client.go.tmpl")
+	t, err := template.New("client.go.tmpl").Funcs(templateFuncs).Parse(clientTemplateFile)
 	if err != nil {
 		return err
 	}
