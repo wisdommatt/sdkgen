@@ -23,6 +23,19 @@ import (
 {{ range $type := $union.Types }}func (u {{ toCamelCase $type }}) Is{{ $unionName }}() {}
 {{ end }}
 
+type {{ $unionName }}Instance struct {
+    {{ range $fieldName := extractUnionFields $schema $union }}{{ toCamelCase $fieldName }} interface{} `json:"{{ $fieldName }}"`
+    {{ end }} TypeName string `json:"__typename"`
+}
+
+func (i {{ $unionName }}Instance) Decode(v interface{}) error {
+    iBytes, err := json.Marshal(i)
+    if err != nil {
+        return err
+    }
+    return json.Unmarshal(iBytes, v)
+}
+
 {{ end }}
 
 {{/* Generating Go types for graphql Enums */}}
@@ -51,8 +64,19 @@ func (e {{ $enumName }}) String() string {
 {{ end }}
 {{ end }}
 
-{{/* Generating Go types for graphql Types (inputs, objects) */}}
+{{/* Generating Go types for graphql Types */}}
 {{ range $val := .Objects }}
+{{ if isExported $val.Name }}
+
+{{ extractGoComment $val.Name $val.Description }} type {{ $val.Name }} struct {
+    {{ range $field := $val.Fields }} {{ extractGoComment $field.Name $field.Description }} {{ if and (isExported $field.Name) (isExported $field.Type.Name) }} {{ toCamelCase $field.Name }} {{ extractFieldTypeName $schema $field.Name $field.Type 1 }} `json:"{{ $field.Name }}"` {{ end }}
+    {{ end }}
+}
+{{ end }}
+{{ end }}
+
+{{/* Generating Go types for graphql Inputs */}}
+{{ range $val := .Inputs }}
 {{ if isExported $val.Name }}
 
 {{ extractGoComment $val.Name $val.Description }} type {{ $val.Name }} struct {
@@ -183,7 +207,7 @@ func parseGqlError(err error) error {
     if err != nil && err.Error() != "" {
         errMsg := err.Error()
         if strings.HasPrefix(errMsg, "graphql: ") {
-            return errors.New(errMsg[9:])
+            return fmt.Errorf(errMsg[9:])
         }
         return err
     }

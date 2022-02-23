@@ -18,6 +18,7 @@ import (
 type Schema struct {
 	AstSchema     *ast.Schema
 	Objects       map[string]*ast.Definition
+	Inputs        map[string]*ast.Definition
 	Scalars       map[string]*ast.Definition
 	Unions        map[string]*ast.Definition
 	Enums         map[string]*ast.Definition
@@ -31,6 +32,7 @@ func NewSchema(astSchema *ast.Schema) *Schema {
 	return &Schema{
 		AstSchema: astSchema,
 		Objects:   make(map[string]*ast.Definition),
+		Inputs:    make(map[string]*ast.Definition),
 		Scalars:   make(map[string]*ast.Definition),
 		Unions:    make(map[string]*ast.Definition),
 		Enums:     make(map[string]*ast.Definition),
@@ -57,7 +59,7 @@ var (
 	}
 
 	templateFuncs = template.FuncMap{
-		"extractFieldTypeName": func(schema *Schema, name string, typ *ast.Type) string {
+		"extractFieldTypeName": func(schema *Schema, name string, typ *ast.Type, isObj ...interface{}) string {
 			fieldType := strings.ReplaceAll(typ.Name(), "!", "")
 
 			// checking if field type is an array.
@@ -72,6 +74,10 @@ var (
 				// is a graphql scalar.
 				if _, ok := schema.Scalars[fieldType]; ok {
 					return "[]interface{}"
+				}
+				// checking if the field type is a union type.
+				if _, ok := schema.Unions[fieldType]; isObj != nil && ok {
+					fieldType += "Instance"
 				}
 				if typ.Elem.NonNull {
 					return "[]" + strcase.ToCamel(fieldType)
@@ -89,6 +95,10 @@ var (
 			// is a graphql scalar.
 			if _, ok := schema.Scalars[fieldType]; ok {
 				return "interface{}"
+			}
+			// checking if the field type is a union type.
+			if _, ok := schema.Unions[fieldType]; isObj != nil && ok {
+				fieldType += "Instance"
 			}
 			if typ.NonNull {
 				return strcase.ToCamel(fieldType)
@@ -136,6 +146,20 @@ var (
 			name = strcase.ToCamel(name)
 			comment := fmt.Sprintf("// %s %s \n", name, description)
 			return comment
+		},
+		"extractUnionFields": func(schema *Schema, union *ast.Definition) []string {
+			checker := map[string]bool{}
+			fields := []string{}
+			for _, typeName := range union.Types {
+				typeDefinition := schema.Objects[typeName]
+				for _, field := range typeDefinition.Fields {
+					if _, ok := checker[field.Name]; !ok {
+						fields = append(fields, field.Name)
+						checker[field.Name] = true
+					}
+				}
+			}
+			return fields
 		},
 	}
 )
@@ -189,8 +213,11 @@ func parseSchema(schema *Schema) *Schema {
 		case ast.Enum:
 			schema.Enums[key] = typ
 
-		case ast.Object, ast.InputObject:
+		case ast.Object:
 			schema.Objects[key] = typ
+
+		case ast.InputObject:
+			schema.Inputs[key] = typ
 		}
 	}
 	return schema
