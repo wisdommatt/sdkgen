@@ -86,30 +86,6 @@ func (e {{ $enumName }}) String() string {
 {{ end }}
 {{ end }}
 
-type GraphqlClient interface {
-    Mutations
-    Queries
-    Subscriptions
-}
-
-{{/* Generating mutations interface methods */}}
-type Mutations interface {
-    {{ range $mutation := $schema.Mutations }} {{ if isExported $mutation.Name }} {{ toCamelCase $mutation.Name }}(ctx context.Context, {{ range $arg := $mutation.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ extractFieldTypeName $schema $mutation.Name $mutation.Type }}, error)
-    {{ end }}{{ end }}
-}
-
-{{/* Generating queries interface methods */}}
-type Queries interface {
-    {{ range $query := $schema.Queries }} {{ if isExported $query.Name }} {{ toCamelCase $query.Name }}(ctx context.Context, {{ range $arg := $query.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ extractFieldTypeName $schema $query.Name $query.Type }}, error)
-    {{ end }}{{ end }}
-}
-
-{{/* Generating subscriptions interface methods */}}
-type Subscriptions interface {
-    {{ range $sub := $schema.Subscriptions }} {{ if isExported $sub.Name }} {{ toCamelCase $sub.Name }}(ctx context.Context, {{ range $arg := $sub.Arguments }} {{ $arg.Name }} {{ extractFieldTypeName $schema $arg.Name $arg.Type }}, {{ end }}) ({{ extractFieldTypeName $schema $sub.Name $sub.Type }}, error)
-    {{ end }}{{ end }}
-}
-
 // ClientConfig is the config used for creating a new
 // graphql client.
 type ClientConfig struct {
@@ -119,8 +95,7 @@ type ClientConfig struct {
 	DefaultHTTPHeaders map[string]string
 }
 
-// GqlClient is the default implementation for 
-// GraphqlClient interface.
+// GqlClient represents a graphql client.
 type GqlClient struct {
     Mutation *Mutation
     Query *Query
